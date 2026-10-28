@@ -92,6 +92,49 @@ describe("importación y exportación", () => {
   ])("rechaza importación malformada %#", (value) =>
     expect(() => parseSnapshot(value)).toThrow(),
   );
+  it.each([
+    "1",
+    "2025-01-01",
+    "2025-02-30T00:00:00Z",
+    "2025-02-29T00:00:00Z",
+    "2025-04-31T00:00:00Z",
+    "2025-01-01T24:00:00Z",
+    "2025-01-01T00:00:00",
+    "2025-01-01T00:00:00+24:00",
+  ])("exige timestamps RFC3339 con calendario válido: %s", (value) => {
+    expect(() => parseSnapshot({ ...fixture, created: value })).toThrow();
+    expect(() => parseSnapshot({ ...fixture, fetched: value })).toThrow();
+  });
+  it("admite una zona explícita, fracciones y fechas de vigencia ISO", () => {
+    const valid = {
+      ...fixture,
+      created: "2024-02-29T23:59:59.1234567+01:30",
+      fetched: "2025-01-01T00:00:00-00:00",
+      rates: [{ ...r, effectiveStartDate: "2024-02-29", tierMinimumUnits: 0 }],
+    };
+    expect(parseSnapshot(valid)).toEqual(valid);
+  });
+  it.each(["1", "2025-02-30", "2025-01-01T00:00:00"])(
+    "rechaza fechas de vigencia ambiguas o imposibles: %s",
+    (effectiveStartDate) => {
+      expect(eligible({ ...r, effectiveStartDate }, c)).toBe(false);
+    },
+  );
+  it("reconstruye los campos permitidos sin conservar extras ni mutar la entrada", () => {
+    const input = {
+      ...fixture,
+      unknown: "root extra",
+      config: { ...c, token: "unexpected secret" },
+      rates: [{ ...r, unknown: { nested: "rate extra" } }],
+    };
+    const parsed = parseSnapshot(input);
+    expect(parsed).toEqual(fixture);
+    expect(parsed.config).not.toBe(input.config);
+    expect(parsed.rates[0]).not.toBe(input.rates[0]);
+    expect(input.config.token).toBe("unexpected secret");
+    expect(JSON.stringify(parsed)).not.toContain("unexpected secret");
+    expect(JSON.stringify(parsed)).not.toContain("rate extra");
+  });
   it("escapa CSV, fórmulas precedidas de espacios y saltos", () => {
     expect(csv([["=1+1", 'a"b']])).toContain('"\'=1+1","a""b"');
     for (const v of ["  =1+1", "\t@SUM(A1)", "\rtest", "\n=1"])
@@ -104,6 +147,7 @@ describe("caducidad", () => {
     expect(isStale("2026-01-01T00:00:00Z", 24, now)).toBe(true);
     expect(isStale("2026-01-03T00:00:00Z", 24, now)).toBe(true);
     expect(isStale("invalid", 24, now)).toBe(true);
+    expect(isStale("2025-02-30T00:00:00Z", 24 * 365, now)).toBe(true);
     expect(isStale("2026-01-01T12:00:00Z", 24, now)).toBe(false);
   });
 });

@@ -345,7 +345,7 @@ function App() {
       <Suspense
         fallback={<div className="empty small-empty">Cargando gráfico…</div>}
       >
-        <CostCharts monthly={Number(cost.monthlyExact)} kind={kind} />
+        <CostCharts monthly={cost.monthlyExact} kind={kind} />
       </Suspense>
     ) : (
       <div className="empty">

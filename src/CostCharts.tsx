@@ -1,3 +1,4 @@
+import { projectCosts } from "./projections";
 import {
   BarChart,
   Bar,
@@ -13,13 +14,10 @@ export default function CostCharts({
   monthly,
   kind = "projection",
 }: {
-  monthly: number;
+  monthly: string;
   kind?: "projection" | "breakdown";
 }) {
-  const data = Array.from({ length: 12 }, (_, i) => ({
-    month: `${i + 1}`,
-    USD: Number((monthly * (i + 1)).toFixed(2)),
-  }));
+  const data = projectCosts(monthly);
   const axes = {
     tick: { fill: "var(--muted)", fontSize: 11 },
     axisLine: false,
@@ -71,7 +69,7 @@ export default function CostCharts({
           </LineChart>
         ) : (
           <BarChart
-            data={[{ name: "Computación", USD: monthly }]}
+            data={[{ name: "Computación", USD: data[0].USD }]}
             margin={{ top: 12, right: 18, bottom: 4, left: 4 }}
           >
             <CartesianGrid

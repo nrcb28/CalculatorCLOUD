@@ -147,7 +147,7 @@ async fn check_provider(
 }
 #[tauri::command]
 fn save_budget(app: tauri::AppHandle, id: String, data: String) -> Result<(), String> {
-    validation::validate_budget(&id, &data)?;
+    let data = validation::normalize_budget(&id, &data)?;
     database(&app)?
         .execute(
             "INSERT INTO budgets(id,data) VALUES(?1,?2)",

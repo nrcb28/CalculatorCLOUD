@@ -15,18 +15,25 @@ pub fn valid_input(sku: &str, region: &str, ttl: u32) -> bool {
 
 fn text(v: &Value, max: usize) -> bool {
     v.as_str()
-        .is_some_and(|s| !s.trim().is_empty() && s.chars().count() <= max)
+        .is_some_and(|s| !s.trim().is_empty() && s.encode_utf16().count() <= max)
+}
+fn timestamp(s: &str) -> Option<chrono::DateTime<chrono::FixedOffset>> {
+    if s.len() > 40 {
+        return None;
+    }
+    chrono::DateTime::parse_from_rfc3339(s)
+        .ok()
+        .filter(|d| d.timestamp_subsec_nanos() < 1_000_000_000)
 }
 fn date(v: &Value) -> bool {
-    v.as_str()
-        .is_some_and(|s| chrono::DateTime::parse_from_rfc3339(s).is_ok())
+    v.as_str().is_some_and(|s| timestamp(s).is_some())
 }
 fn number(v: &Value, max: f64) -> bool {
     v.as_f64()
         .is_some_and(|n| n.is_finite() && n >= 0.0 && n <= max)
 }
 pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
-    if id.is_empty() || id.len() > 100 || data.len() > 5_000_000 {
+    if id.trim().is_empty() || id.encode_utf16().count() > 100 || data.len() > 5_000_000 {
         return Err("Tamaño de presupuesto no válido".into());
     }
     let v: Value = serde_json::from_str(data).map_err(|_| "JSON no válido")?;
@@ -54,15 +61,15 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
     }
     let r = &rates[0];
     let start = r["effectiveStartDate"].as_str().and_then(|s| {
-        chrono::DateTime::parse_from_rfc3339(s)
-            .ok()
-            .map(|t| t.timestamp())
-            .or_else(|| {
-                chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d")
-                    .ok()
-                    .and_then(|d| d.and_hms_opt(0, 0, 0))
-                    .map(|d| d.and_utc().timestamp())
-            })
+        timestamp(s).map(|t| t.timestamp()).or_else(|| {
+            if s.len() != 10 {
+                return None;
+            }
+            chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d")
+                .ok()
+                .and_then(|d| d.and_hms_opt(0, 0, 0))
+                .map(|d| d.and_utc().timestamp())
+        })
     });
     let labels = format!(
         "{} {}",
@@ -99,6 +106,43 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
     }
     Ok(())
 }
+// Persistir solo el esquema permitido, también cuando el comando se invoca sin el frontend.
+pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
+    validate_budget(id, data)?;
+    let input: Value = serde_json::from_str(data).map_err(|_| "JSON no válido")?;
+    fn select(input: &Value, keys: &[&str]) -> Value {
+        let mut output = serde_json::Map::new();
+        for key in keys {
+            if let Some(value) = input.get(*key) {
+                output.insert((*key).to_string(), value.clone());
+            }
+        }
+        Value::Object(output)
+    }
+    let mut output = select(&input, &["id", "name", "created", "fetched"]);
+    output["config"] = select(
+        &input["config"],
+        &["sku", "region", "instances", "hours", "storage", "egress"],
+    );
+    output["rates"] = Value::Array(vec![select(
+        &input["rates"][0],
+        &[
+            "meterId",
+            "skuName",
+            "armSkuName",
+            "productName",
+            "armRegionName",
+            "unitOfMeasure",
+            "retailPrice",
+            "currencyCode",
+            "effectiveStartDate",
+            "type",
+            "isPrimaryMeterRegion",
+            "tierMinimumUnits",
+        ],
+    )]);
+    serde_json::to_string(&output).map_err(|_| "No se pudo serializar el presupuesto".into())
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -122,6 +166,49 @@ mod tests {
         let mut v = budget();
         v["config"]["instances"] = serde_json::json!(1.5);
         assert!(validate_budget("test", &v.to_string()).is_err());
+    }
+    #[test]
+    fn requires_real_rfc3339_timestamps() {
+        for invalid in [
+            "1",
+            "2025-01-01",
+            "2025-02-30T00:00:00Z",
+            "2025-02-29T00:00:00Z",
+            "2025-04-31T00:00:00Z",
+            "2025-01-01T24:00:00Z",
+            "2025-01-01T00:00:00",
+            "2025-01-01T00:00:00+24:00",
+            "2025-01-01T23:59:60Z",
+        ] {
+            for field in ["created", "fetched"] {
+                let mut v = budget();
+                v[field] = serde_json::json!(invalid);
+                assert!(
+                    validate_budget("test", &v.to_string()).is_err(),
+                    "{}: {}",
+                    field,
+                    invalid
+                );
+            }
+        }
+    }
+    #[test]
+    fn accepts_fractional_offsets_and_date_only_rate_effectivity() {
+        let mut v = budget();
+        v["created"] = serde_json::json!("2024-02-29T23:59:59.1234567+01:30");
+        v["fetched"] = serde_json::json!("2025-01-01T00:00:00-00:00");
+        v["rates"][0]["effectiveStartDate"] = serde_json::json!("2024-02-29");
+        assert!(validate_budget("test", &v.to_string()).is_ok());
+    }
+    #[test]
+    fn removes_unknown_fields_before_persistence() {
+        let mut v = budget();
+        v["config"]["token"] = serde_json::json!("test-only");
+        v["rates"][0]["extra"] = serde_json::json!({"nested":"test-only"});
+        v["unknown"] = serde_json::json!("test-only");
+        let clean = normalize_budget("test", &v.to_string()).unwrap();
+        assert!(!clean.contains("test-only"));
+        assert!(validate_budget("test", &clean).is_ok());
     }
     #[test]
     fn rejects_mismatched_rates() {

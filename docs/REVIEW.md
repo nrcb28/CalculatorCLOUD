@@ -3,13 +3,13 @@
 ## Fallos corregidos
 
 - Un consumo inválido (cero instancias, decimales en instancias, campo vacío o infinito) podía lanzar una excepción durante el render de React. Ahora se valida antes de calcular y se muestra el error sin bloquear la interfaz.
-- Los JSON importados admitían campos incompletos o tarifas incompatibles. Se valida la estructura y la concordancia de SKU/región, moneda, unidad, precio, modalidad, vigencia y tipo de medidor. El backend aplica también validación antes de SQLite.
+- Los JSON importados admitían campos incompletos o tarifas incompatibles. Se valida la estructura y la concordancia de SKU/región, moneda, unidad, precio, modalidad, vigencia y tipo de medidor. El backend aplica también validación antes de SQLite. Se rechazan fechas imposibles, ambiguas o sin zona, y se descartan campos desconocidos tanto en la importación como al persistir.
 - Una consulta Azure pendiente podía reemplazar un escenario recién abierto. Las respuestas de consultas anteriores se descartan cuando cambia la configuración o se importa un presupuesto.
 - El identificador SQL de un presupuesto era diferente de su ID JSON. Ahora se genera y reutiliza un único ID.
 - Una fila dañada bloqueaba todo el historial. Se omite y se informa del número de filas no válidas.
 - El selector usaba solo meterId, que puede repetirse con distintos precios y fechas. Usa una clave compuesta, deduplica copias idénticas y muestra la fecha de vigencia.
 - Se excluyen tarifas futuras y medidores con tramos detectados en el catálogo; no se extrapola su primer tramo.
-- La gráfica anual usaba un mensual ya redondeado. Ahora parte del importe completo antes de redondear para mostrarlo.
+- La gráfica anual usaba un mensual ya redondeado. Ahora parte del importe completo y aplica redondeo decimal coherente con el motor, incluso en medios céntimos.
 - La caché con fecha futura se aceptaba como fresca. Se rechaza y se marcan como obsoletas las fechas inválidas, futuras o expiradas.
 - Los errores de red desaparecían al recuperar una caché. Se conservan en un aviso visible.
 - El límite HTTP solo comprobaba Content-Length. Ahora también se comprueba durante la lectura. Se añade un plazo total de 90 segundos para Azure.
@@ -26,7 +26,7 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
 - 8 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias y exportación.
-- 6 pruebas Rust del núcleo: caché, restricciones de paginación, filtros y esquema de presupuestos.
+- 9 pruebas Rust del núcleo: caché, restricciones de paginación, filtros y esquema de presupuestos.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.
 - CI ampliada con navegador, auditoría, formato y núcleo Rust sin GUI, además de instaladores para Windows y Linux.
