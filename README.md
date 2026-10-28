@@ -61,6 +61,10 @@ Para usar el Chromium del sistema en Linux: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr
 
 USD es la única moneda soportada. El cálculo usa `decimal.js`; anual = mensual × 12, diario medio = mensual / 30. Horas permitidas: 0–744. Los snapshots guardan fuente, fecha y tarifa. La caché expirada se identifica y puede recuperarse si falla la red. El tema y la caducidad persisten localmente. Las fechas futuras de caché se consideran no fiables. Los errores de actualización se muestran cuando se recuperan datos guardados.
 
+## Conectividad y proxy
+
+El cliente usa certificados del sistema y detecta el proxy del sistema en las plataformas compatibles. Los bloqueos de red tienen mensajes específicos y no se solucionan con un login de Azure. Consulta el [diagnóstico de conectividad](docs/CONNECTIVITY.md), que incluye una comprobación del conector sin GUI.
+
 ## Fuentes oficiales y referencias para continuar
 
 - Tauri 2: https://v2.tauri.app/start/prerequisites/

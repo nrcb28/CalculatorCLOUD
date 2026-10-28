@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use cloudcost_core::{
+    http::{self, ConnectionError},
     provider::{bounded_json, fetch_catalog, fresh, AZURE},
     validation::{self, valid_input},
 };
@@ -33,7 +34,7 @@ async fn azure_prices(
     sku: String,
     region: String,
     ttl_hours: u32,
-) -> Result<Catalog, String> {
+) -> Result<Catalog, ConnectionError> {
     if !valid_input(&sku, &region, ttl_hours) {
         return Err("SKU, región o caducidad no válidos".into());
     }
@@ -88,14 +89,11 @@ async fn azure_prices(
                 fetched,
                 cached: true,
                 warning: Some(format!(
-                    "{}. Se muestran tarifas de caché sin actualizar; revisa su fecha.",
-                    error
+                    "{} {} Se muestran tarifas de caché sin actualizar; revisa su fecha.",
+                    error.message, error.action
                 )),
             }),
-            None => Err(format!(
-                "{}. No hay tarifas guardadas para este SKU y región.",
-                error
-            )),
+            None => Err(error),
         },
     }
 }
@@ -108,12 +106,14 @@ struct ConnectionStatus {
 async fn check_provider(
     provider: String,
     api_key: Option<String>,
-) -> Result<ConnectionStatus, String> {
-    let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(20))
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|_| "Cliente HTTPS no disponible")?;
+) -> Result<ConnectionStatus, ConnectionError> {
+    let client = http::client(Duration::from_secs(20))?;
+    let host = match provider.as_str() {
+        "Azure" => "prices.azure.com",
+        "AWS" => "pricing.us-east-1.amazonaws.com",
+        "GCP" => "cloudbilling.googleapis.com",
+        _ => return Err("Proveedor desconocido".into()),
+    };
     let request = match provider.as_str() {
         "Azure" => client.get(AZURE).query(&[("$filter", "serviceName eq 'Virtual Machines' and armRegionName eq 'westeurope' and armSkuName eq 'Standard_D4s_v5'")]),
         "AWS" => client.get("https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json"),
@@ -123,12 +123,12 @@ async fn check_provider(
         },
         _ => return Err("Proveedor desconocido".into()),
     };
-    let response = request.send().await.map_err(|_| {
-        "Sin conexión: comprueba Internet, proxy y firewall. Un login no corrige un bloqueo de red."
-    })?;
-    let code = response.status().as_u16();
+    let response = request
+        .send()
+        .await
+        .map_err(|error| http::from_transport(&error, host))?;
     if !response.status().is_success() {
-        return Err(match code {401|403 => "Acceso rechazado (401/403): revisa permisos, API habilitada y restricciones de clave; también puede intervenir el proxy.".into(),429 => "Límite de solicitudes alcanzado. Inténtalo más tarde.".into(),_=>format!("El proveedor devolvió HTTP {}",code)});
+        return Err(http::status_error(response.status().as_u16(), host));
     }
     let body = bounded_json(response).await?;
     let valid = match provider.as_str() {

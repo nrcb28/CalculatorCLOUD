@@ -46,6 +46,7 @@ import {
   type Rate,
   type Snapshot,
 } from "./engine";
+import { errorMessage } from "./errors";
 import "./style.css";
 const CostCharts = lazy(() => import("./CostCharts"));
 const initial: Config = {
@@ -199,7 +200,7 @@ function App() {
           .join(" "),
       );
     } catch (e) {
-      if (id === requestId.current) setMessage(String(e));
+      if (id === requestId.current) setMessage(errorMessage(e));
     } finally {
       if (id === requestId.current) setBusy(false);
     }
@@ -227,7 +228,7 @@ function App() {
           `${invalid} presupuesto(s) no válido(s) omitido(s). Los demás siguen disponibles.`,
         );
     } catch (e) {
-      setMessage(String(e));
+      setMessage(errorMessage(e));
     } finally {
       setLoadingHistory(false);
     }
@@ -255,7 +256,7 @@ function App() {
       await invoke("save_budget", { id: data.id, data: JSON.stringify(data) });
       setMessage("Presupuesto guardado con una copia de la tarifa y su fecha.");
     } catch (e) {
-      setMessage(String(e));
+      setMessage(errorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -289,7 +290,7 @@ function App() {
       );
       setMessage(result.provider + ": " + result.message);
     } catch (e) {
-      setMessage(String(e));
+      setMessage(errorMessage(e));
     } finally {
       setChecking(false);
     }
@@ -337,7 +338,7 @@ function App() {
           "text/csv",
         );
     } catch (e) {
-      setMessage(String(e));
+      setMessage(errorMessage(e));
     }
   }
   const chart = (kind: "projection" | "breakdown" = "projection") =>
@@ -1062,7 +1063,7 @@ function App() {
                           restore(parseSnapshot(JSON.parse(await file.text())));
                         }
                       } catch (e) {
-                        setMessage(String(e));
+                        setMessage(errorMessage(e));
                       } finally {
                         input.value = "";
                       }

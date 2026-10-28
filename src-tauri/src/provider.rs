@@ -1,3 +1,4 @@
+use crate::http::{self, ConnectionError};
 use serde::Deserialize;
 use std::time::Duration;
 pub const AZURE: &str = "https://prices.azure.com/api/retail/prices";
@@ -17,7 +18,9 @@ fn valid_url(url: &url::Url) -> bool {
         && url.password().is_none()
 }
 const MAX_RESPONSE_BYTES: usize = 20_000_000;
-pub async fn bounded_json(mut response: reqwest::Response) -> Result<serde_json::Value, String> {
+pub async fn bounded_json(
+    mut response: reqwest::Response,
+) -> Result<serde_json::Value, ConnectionError> {
     if response.content_length().unwrap_or(0) > MAX_RESPONSE_BYTES as u64 {
         return Err("Respuesta demasiado grande".into());
     }
@@ -42,15 +45,14 @@ pub fn fresh(fetched: &str, ttl: u32, now: chrono::DateTime<chrono::Utc>) -> boo
         })
         .unwrap_or(false)
 }
-pub async fn fetch_catalog(sku: &str, region: &str) -> Result<Vec<serde_json::Value>, String> {
+pub async fn fetch_catalog(
+    sku: &str,
+    region: &str,
+) -> Result<Vec<serde_json::Value>, ConnectionError> {
     if !crate::validation::valid_input(sku, region, 24) {
         return Err("SKU o región no válidos".into());
     }
-    let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(30))
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|_| "Cliente HTTPS no disponible")?;
+    let client = http::client(Duration::from_secs(30))?;
     let mut next = url::Url::parse(AZURE).map_err(|_| "URL no válida")?;
     next.query_pairs_mut().append_pair("api-version", "2023-01-01-preview").append_pair("currencyCode", "'USD'").append_pair("$filter", &format!("serviceName eq 'Virtual Machines' and armRegionName eq '{}' and armSkuName eq '{}' and priceType eq 'Consumption'", region, sku));
     let mut all = Vec::new();
@@ -59,6 +61,7 @@ pub async fn fetch_catalog(sku: &str, region: &str) -> Result<Vec<serde_json::Va
         if !valid_url(&next) || !seen.insert(next.to_string()) {
             return Err("Paginación Azure no válida".into());
         }
+        let host = next.host_str().ok_or("URL no válida")?;
         let mut response = None;
         for attempt in 0..3 {
             match client.get(next.clone()).send().await {
@@ -66,7 +69,11 @@ pub async fn fetch_catalog(sku: &str, region: &str) -> Result<Vec<serde_json::Va
                     response = Some(r);
                     break;
                 }
-                Ok(r) if r.status().as_u16() == 429 || r.status().is_server_error() => {
+                Ok(r) => {
+                    let failure = http::status_error(r.status().as_u16(), host);
+                    if !failure.retryable || attempt == 2 {
+                        return Err(failure);
+                    }
                     let delay = r
                         .headers()
                         .get("retry-after")
@@ -76,8 +83,11 @@ pub async fn fetch_catalog(sku: &str, region: &str) -> Result<Vec<serde_json::Va
                         .min(30);
                     tokio::time::sleep(Duration::from_secs(delay)).await;
                 }
-                Ok(r) => return Err(format!("Azure respondió HTTP {}", r.status().as_u16())),
-                Err(_) => {
+                Err(error) => {
+                    let failure = http::from_transport(&error, host);
+                    if !failure.retryable || attempt == 2 {
+                        return Err(failure);
+                    }
                     tokio::time::sleep(Duration::from_secs(1 << attempt)).await;
                 }
             }
