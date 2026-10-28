@@ -1,0 +1,11 @@
+# Arquitectura v0.1
+
+La interfaz React vive en `src/main.tsx`; el motor puro decimal y los modelos en `src/engine.ts`. Tailwind 4 se procesa mediante Vite. Recharts representa proyecciones con la tarifa seleccionada.
+
+Rust en `src-tauri/src/main.rs` ofrece comandos acotados: consultar Azure, guardar y recuperar snapshots. SQLite se almacena en el directorio de datos de la aplicación por usuario. Las consultas SQL están parametrizadas. No se permite HTTP arbitrario desde el frontend. El backend valida filtros y restringe la paginación al endpoint HTTPS oficial; desactiva redirecciones. La caché es por SKU/región/moneda, con caducidad de 1–720 horas y recuperación sin conexión. Una tarifa caducada se señala en interfaz. Los presupuestos almacenan el precio consultado y no se actualizan silenciosamente.
+
+La primera versión calcula solo computación Linux de pago por uso. Se excluyen candidatos Windows, Spot y Low Priority. No selecciona automáticamente la tarifa más barata. El usuario revisa el producto y el SKU. No infiere rendimiento ni equivalencia técnica a partir del nombre del SKU. Almacenamiento y red se registran como solicitudes sin coste calculado. Los importes son subtotales, nunca un presupuesto completo.
+
+Extensión: extraer `providers/azure.rs`, implementar el mismo contrato para AWS y GCP, normalizar una estructura `PriceComponent` con fuente, SKU, región, moneda, unidad, vigencia, tramos y alcance. Añadir inventario técnico verificado antes de recomendar equivalencias. La selección de proveedor necesita cobertura completa y moneda común verificable.
+
+Seguridad: sin secretos persistidos; el panel de acceso acepta una API key de GCP para una comprobación puntual y la envía en cabecera HTTPS, HTTPS con validación TLS, CSP restrictiva, permisos mínimos Tauri, sin shell, sin lectura arbitraria del sistema. El CSV neutraliza prefijos de fórmulas. Importaciones JSON limitadas a 5 MB. Pendiente endurecer el límite de streaming HTTP y ampliar la validación nativa del esquema de presupuestos.
