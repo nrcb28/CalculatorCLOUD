@@ -1,13 +1,109 @@
-import {describe,it,expect} from 'vitest';
-import {compute,eligible,parseSnapshot,csv,type Rate} from './engine';
-const c={sku:'Standard_D4s_v5',region:'westeurope',instances:2,hours:730,storage:100,egress:0};
-// Tarifa sintética exclusiva de pruebas; nunca incluida en producción.
-const r:Rate={meterId:'test',skuName:'D4s v5',armSkuName:c.sku,productName:'Virtual Machines Dsv5 Series',armRegionName:c.region,unitOfMeasure:'1 Hour',retailPrice:0.1,currencyCode:'USD',effectiveStartDate:'2026-01-01',type:'Consumption',isPrimaryMeterRegion:true};
-describe('cálculo y selección',()=>{
- it('mantiene precisión decimal y anualiza',()=>{expect(compute(c,r).monthly).toBe('146.00');expect(compute(c,r).annual).toBe('1752.00')});
- it('rechaza horas e instancias inválidas',()=>{expect(()=>compute({...c,hours:745},r)).toThrow();expect(()=>compute({...c,instances:1.5},r)).toThrow()});
- it('rechaza unidades distintas y valores no finitos',()=>{expect(()=>compute(c,{...r,unitOfMeasure:'1 GB'})).toThrow();expect(()=>compute(c,{...r,retailPrice:NaN})).toThrow()});
- it('excluye Windows, Spot y regiones distintas',()=>{expect(eligible(r,c)).toBe(true);expect(eligible({...r,skuName:'Spot'},c)).toBe(false);expect(eligible({...r,productName:'Windows'},c)).toBe(false);expect(eligible({...r,armRegionName:'eastus'},c)).toBe(false)});
- it('rechaza importaciones sin estructura',()=>expect(()=>parseSnapshot({})).toThrow());
- it('escapa CSV y fórmulas',()=>expect(csv([['=1+1','a"b']])).toContain('"\'=1+1","a""b"'));
+import { describe, it, expect } from "vitest";
+import {
+  compute,
+  eligible,
+  parseSnapshot,
+  csv,
+  validate,
+  candidates,
+  rateKey,
+  isStale,
+} from "./engine";
+import { fixture } from "../tests/fixtures";
+const c = fixture.config,
+  r = fixture.rates[0];
+describe("cálculo y selección", () => {
+  it("mantiene precisión decimal y anualiza", () => {
+    expect(compute(c, r).monthly).toBe("146.00");
+    expect(compute(c, r).annual).toBe("1752.00");
+  });
+  it("no redondea el subtotal antes de proyectar", () => {
+    const cost = compute(
+      { ...c, instances: 1 },
+      { ...r, retailPrice: 0.00001 },
+    );
+    expect(cost.monthly).toBe("0.01");
+    expect(cost.monthlyExact).toBe("0.0073");
+    expect(cost.annual).toBe("0.09");
+  });
+  it("permite cero horas y conserva precisión con horas fraccionarias", () => {
+    expect(compute({ ...c, hours: 0 }, r).monthly).toBe("0.00");
+    expect(compute({ ...c, hours: 0.25 }, r).monthly).toBe("0.05");
+  });
+  it.each([
+    null,
+    {},
+    { ...c, hours: 745 },
+    { ...c, instances: 1.5 },
+    { ...c, instances: 0 },
+    { ...c, hours: NaN },
+    { ...c, egress: Infinity },
+    { ...c, storage: 1e10 },
+    { ...c, sku: undefined },
+  ])("rechaza configuración inválida %#", (value) =>
+    expect(() => validate(value)).toThrow(),
+  );
+  it.each([
+    { ...r, unitOfMeasure: "1 GB" },
+    { ...r, retailPrice: NaN },
+    { ...r, retailPrice: -1 },
+    { ...r, currencyCode: "EUR" },
+    { ...r, armSkuName: "Other" },
+    { ...r, armRegionName: "eastus" },
+    { ...r, skuName: "Spot" },
+    { ...r, productName: "Windows" },
+    { ...r, tierMinimumUnits: 100 },
+    { ...r, effectiveStartDate: "2999-01-01T00:00:00Z" },
+  ])("no calcula ni selecciona tarifas incompatibles %#", (value) => {
+    expect(eligible(value, c)).toBe(false);
+    expect(() => compute(c, value)).toThrow();
+  });
+  it("no extrapola el primer tramo de un medidor con múltiples tramos", () => {
+    expect(
+      candidates([r, { ...r, tierMinimumUnits: 100, retailPrice: 0.05 }], c),
+    ).toEqual([]);
+  });
+  it("descarta respuestas malformadas sin bloquear el selector", () => {
+    expect(
+      candidates([null, {}, r, { ...r, retailPrice: Infinity }], c),
+    ).toEqual([r]);
+  });
+  it("distingue tarifas con el mismo meterId y deduplica copias idénticas", () => {
+    const another = { ...r, retailPrice: 0.2 };
+    expect(rateKey(r)).not.toBe(rateKey(another));
+    expect(candidates([r, r, another], c)).toHaveLength(2);
+  });
+});
+describe("importación y exportación", () => {
+  it("recupera los valores originales de un snapshot", () =>
+    expect(parseSnapshot(JSON.parse(JSON.stringify(fixture)))).toEqual(
+      fixture,
+    ));
+  it.each([
+    {},
+    null,
+    { ...fixture, config: null },
+    { ...fixture, rates: [] },
+    { ...fixture, created: "invalid" },
+    { ...fixture, name: 2 },
+    { ...fixture, rates: [{ ...r, currencyCode: undefined }] },
+    { ...fixture, rates: [{ ...r, isPrimaryMeterRegion: "true" }] },
+    { ...fixture, rates: [{ ...r, armRegionName: "eastus" }] },
+  ])("rechaza importación malformada %#", (value) =>
+    expect(() => parseSnapshot(value)).toThrow(),
+  );
+  it("escapa CSV, fórmulas precedidas de espacios y saltos", () => {
+    expect(csv([["=1+1", 'a"b']])).toContain('"\'=1+1","a""b"');
+    for (const v of ["  =1+1", "\t@SUM(A1)", "\rtest", "\n=1"])
+      expect(csv([[v]])).toContain("\"'" + v + '"');
+  });
+});
+describe("caducidad", () => {
+  const now = Date.parse("2026-01-02T00:00:00Z");
+  it("marca el límite exacto, fechas inválidas y relojes adelantados", () => {
+    expect(isStale("2026-01-01T00:00:00Z", 24, now)).toBe(true);
+    expect(isStale("2026-01-03T00:00:00Z", 24, now)).toBe(true);
+    expect(isStale("invalid", 24, now)).toBe(true);
+    expect(isStale("2026-01-01T12:00:00Z", 24, now)).toBe(false);
+  });
 });

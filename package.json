@@ -8,23 +8,29 @@
     "build": "tsc && vite build",
     "test": "vitest run",
     "tauri": "tauri",
-    "desktop": "tauri dev"
+    "desktop": "tauri dev",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src tests *.ts *.json .github/workflows/*.yml",
+    "format:check": "prettier --check src tests *.ts *.json .github/workflows/*.yml"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",
+    "decimal.js": "^10.4.3",
+    "lucide-react": "^1.63.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "decimal.js": "^10.4.3",
     "recharts": "^3.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/vite": "^4.1.0",
     "@tauri-apps/cli": "^2.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.1.0",
     "typescript": "~5.9.3",
     "vite": "^7.1.0",
-    "vitest": "^3.2.0",
-    "tailwindcss": "^4.1.0",
-    "@tailwindcss/vite": "^4.1.0"
+    "vitest": "^5.0.5"
   }
 }

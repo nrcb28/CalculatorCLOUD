@@ -2,9 +2,11 @@
 
 Primera versión de una **aplicación de escritorio Windows/Linux** con Tauri 2, React, TypeScript y Rust. Interfaz en español, temas claro/oscuro y SQLite local. **v0.1 es una base funcional parcial, no un comparador multicloud completo.**
 
+![Dashboard de CloudCost Compare](docs/images/dashboard.png)
+
 ## Desarrollo
 
-Requisitos: Node.js 22+, Rust estable, dependencias Tauri. En Windows: Microsoft C++ Build Tools (carga de trabajo de desarrollo de escritorio C++), Windows SDK y WebView2. En Linux: WebKitGTK 4.1 y paquetes indicados en el workflow.
+Requisitos: Node.js 22.12+, Rust estable, dependencias Tauri. En Windows: Microsoft C++ Build Tools (carga de trabajo de desarrollo de escritorio C++), Windows SDK y WebView2. En Linux: WebKitGTK 4.1 y paquetes indicados en el workflow.
 
 ```sh
 npm ci
@@ -38,9 +40,26 @@ GitHub Actions ejecuta pruebas y genera artefactos de Windows y Linux por cada p
 
 ## Estado y validación
 
-El entorno de creación dispone de Node.js, pero no de Rust ni WebKitGTK. Verificación local: 6 pruebas de Vitest aprobadas, `npm run build` correcto y Vite iniciado en el puerto 1420. El frontend y sus pruebas se verifican localmente; la compilación nativa se delega a CI. El proxy del entorno bloquea `prices.azure.com` (HTTP 403), por lo que **el conector Azure no ha sido probado contra el servicio real**. El código incluye paginación, límites, reintentos y caché, pero su operación real queda pendiente de verificación. AWS y GCP no están implementados. El panel de acceso comprueba los endpoints públicos de Azure y AWS. Para GCP permite introducir una API key que se usa únicamente durante una petición al catálogo de servicios, no se guarda en disco y se elimina del formulario. La prueba de acceso no implica tener un conector de estimación AWS/GCP. Estas comprobaciones nativas tampoco se han ejecutado en este entorno.
+La revisión de interfaz y estabilidad incorpora pruebas unitarias TypeScript, pruebas de navegador Chromium y pruebas del núcleo Rust sin GUI. Consulta [la revisión técnica](docs/REVIEW.md) para sus resultados. En este entorno se instaló Rust únicamente en el directorio de trabajo, sin privilegios; faltan las bibliotecas gráficas de Linux, por lo que los instaladores se compilan en GitHub Actions.
 
-USD es la única moneda soportada. El cálculo usa `decimal.js`; anual = mensual × 12, diario medio = mensual / 30. Horas permitidas: 0–744. Los snapshots guardan fuente, fecha y tarifa. La caché expirada se identifica y puede recuperarse si falla la red. Cambiar la caducidad solo afecta a la sesión actual.
+La ejecución inicial de Actions [40657232835](https://github.com/nrcb28/CalculatorCLOUD/actions/runs/40657232835) terminó correctamente con pruebas y paquetes NSIS, .deb y AppImage. Eso acredita la compilación de la versión inicial; cada revisión posterior debe pasar su propia ejecución.
+
+El proxy del entorno bloquea `prices.azure.com` (HTTP 403), por lo que **el conector Azure no ha sido probado contra el servicio real**. AWS y GCP no tienen todavía conectores de estimación. El panel de acceso comprueba los endpoints públicos de Azure y AWS y permite una prueba de GCP mediante API key efímera: no se guarda en disco. Las pruebas de navegador sustituyen IPC por dobles de prueba en determinados casos; no acreditan conexión real con los proveedores.
+
+Para ejecutar todas las comprobaciones:
+
+```sh
+npm test
+npx playwright install chromium
+npm run test:e2e
+npm run format:check
+npm audit
+cargo test --locked --manifest-path src-tauri/Cargo.toml --no-default-features --lib
+```
+
+Para usar el Chromium del sistema en Linux: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:e2e`.
+
+USD es la única moneda soportada. El cálculo usa `decimal.js`; anual = mensual × 12, diario medio = mensual / 30. Horas permitidas: 0–744. Los snapshots guardan fuente, fecha y tarifa. La caché expirada se identifica y puede recuperarse si falla la red. El tema y la caducidad persisten localmente. Las fechas futuras de caché se consideran no fiables. Los errores de actualización se muestran cuando se recuperan datos guardados.
 
 ## Fuentes oficiales y referencias para continuar
 
