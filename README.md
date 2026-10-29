@@ -63,7 +63,7 @@ USD es la única moneda soportada. El cálculo usa `decimal.js`; anual = mensual
 
 ## Conectividad y proxy
 
-El cliente usa certificados del sistema y detecta el proxy del sistema en las plataformas compatibles. Los bloqueos de red tienen mensajes específicos y no se solucionan con un login de Azure. Consulta el [diagnóstico de conectividad](docs/CONNECTIVITY.md), que incluye una comprobación del conector sin GUI.
+El cliente usa certificados del sistema y detecta el proxy del sistema en las plataformas compatibles. Los bloqueos de red tienen mensajes específicos y no se solucionan con un login de Azure. Consulta el [diagnóstico de conectividad](docs/CONNECTIVITY.md), que incluye una comprobación del conector sin GUI y explica cómo publicar cambios de red para usarlos en una tarea nueva. Para retomar la verificación, lee [CONTINUAR.md](docs/CONTINUAR.md).
 
 ## Fuentes oficiales y referencias para continuar
 

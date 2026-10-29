@@ -10,7 +10,20 @@ Los errores de proxy, certificados, autorización, tiempo de espera y conexión 
 
 ## Si el proxy rechaza la conexión
 
-Permite acceso HTTPS al dominio `prices.azure.com` en la red donde se ejecuta la aplicación. En un entorno administrado de Codex, la regla debe estar aplicada a ese entorno en ejecución; guardar una configuración sin aplicarla no acredita que el proceso tenga acceso. Puede ser necesario reaplicar o reiniciar el entorno.
+Permite acceso HTTPS al dominio `prices.azure.com` en la red donde se ejecuta la aplicación.
+
+### Codex Cloud: publicar el cambio y usar una tarea nueva
+
+La configuración de un entorno publicado se utiliza al crear tareas nuevas. Una tarea existente conserva su propio estado; continuar o reintentar en el mismo chat no demuestra que esté utilizando el setup publicado actualizado.
+
+1. Abre **Ajustes > Codex Cloud > Entornos** y selecciona **… > Editar** en el entorno correspondiente.
+2. Configura el acceso a Internet. **Permitir todo el acceso público a Internet** incluye los dominios de gestores de paquetes y los dominios adicionales; por eso esos controles más específicos quedan deshabilitados. Para una lista restringida, desactiva el acceso público completo y añade `prices.azure.com` a los dominios permitidos adicionales.
+3. Guarda, prueba la configuración y selecciona **Publicar / Republicar**.
+4. Crea una **tarea nueva** y selecciona ese entorno publicado. Recupera el código desde GitHub y ejecuta el diagnóstico indicado más abajo.
+
+Las aprobaciones de sitios web de ChatGPT Work administran la navegación y no sustituyen esta configuración de Codex Cloud. Tampoco el permiso «Acceso completo» de una conversación añade por sí mismo una herramienta para editar o publicar el entorno.
+
+Referencias oficiales: [Using Codex Cloud](https://help.openai.com/en/articles/20001545-using-codex-cloud), apartado «Continue your work and update the setup», y [Cloud environments](https://learn.chatgpt.com/docs/environments/cloud-environments), apartados «Reuse and update saved state» y «Connect to services».
 
 La aplicación no puede modificar las reglas del proxy del entorno. Un login de Azure no resuelve un rechazo del túnel HTTPS. No se implementan rutas alternativas para eludir esa restricción.
 
@@ -36,4 +49,4 @@ Esta comprobación no acredita el coste completo de una infraestructura ni compa
 
 ## Evidencia de esta revisión
 
-El diagnóstico ejecutado en el entorno de creación produjo `code=proxy_denied`, `host=prices.azure.com` y `retryable=false`. La consulta de estado del entorno seguía sin incluir ese dominio entre los autorizados. La corrección del cliente está comprobada; la obtención de precios en vivo sigue pendiente de que la regla de red se aplique realmente.
+El diagnóstico ejecutado en el entorno de creación produjo `code=proxy_denied`, `host=prices.azure.com` y `retryable=false`. La consulta de estado del entorno seguía sin incluir ese dominio entre los autorizados. La corrección del cliente está comprobada; la obtención de precios en vivo sigue pendiente de publicar la configuración de red y ejecutar el conector en una tarea nueva que la utilice. Consulta [CONTINUAR.md](CONTINUAR.md) para retomar la verificación sin perder el trabajo ya subido.
