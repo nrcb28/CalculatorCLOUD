@@ -4,6 +4,8 @@ use cloudcost_core::{
 };
 use std::time::Duration;
 fn main() {
+    // Ruta opcional para conservar los registros originales, sin normalizarlos.
+    let output = std::env::args().nth(1);
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -26,6 +28,20 @@ fn main() {
     });
     match result {
         Ok(rates) => {
+            let retrieved_at = chrono::Utc::now().to_rfc3339();
+            if let Some(path) = output {
+                let evidence = serde_json::json!({
+                    "source": AZURE,
+                    "retrievedAt": retrieved_at,
+                    "sku": "Standard_D4s_v5",
+                    "region": "westeurope",
+                    "rates": rates,
+                });
+                if std::fs::write(&path, serde_json::to_vec_pretty(&evidence).unwrap()).is_err() {
+                    eprintln!("No se pudo guardar la evidencia del catálogo");
+                    std::process::exit(1);
+                }
+            }
             let matching = rates
                 .iter()
                 .filter(|rate| {
@@ -40,7 +56,7 @@ fn main() {
                 .count();
             println!(
                 "{}",
-                serde_json::json!({"ok":matching>0,"source":AZURE,"retrievedAt":chrono::Utc::now().to_rfc3339(),"items":rates.len(),"matchingHourlyRates":matching,"scope":"Conectividad y formato. No verifica el coste completo de una infraestructura."})
+                serde_json::json!({"ok":matching>0,"source":AZURE,"retrievedAt":retrieved_at,"items":rates.len(),"matchingHourlyRates":matching,"scope":"Conectividad y formato. No verifica el coste completo de una infraestructura."})
             );
             if matching == 0 {
                 std::process::exit(2);

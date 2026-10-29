@@ -1,0 +1,29 @@
+{
+  "source": "https://prices.azure.com/api/retail/prices",
+  "retrievedAt": "2026-10-29T08:52:19.352746839+00:00",
+  "config": {
+    "sku": "Standard_D4s_v5",
+    "region": "westeurope",
+    "instances": 1,
+    "hours": 730,
+    "storage": 100,
+    "egress": 0
+  },
+  "items": 6,
+  "eligibleRates": 1,
+  "meterId": "1ab41620-5ffa-51b3-ac16-6416f9f747a9",
+  "effectiveStartDate": "2021-11-01T00:00:00Z",
+  "hourlyPriceUSD": 0.23,
+  "subtotal": {
+    "hourly": "0.230000",
+    "monthlyExact": "167.9",
+    "daily": "5.60",
+    "monthly": "167.90",
+    "annual": "2014.80"
+  },
+  "unquoted": [
+    "storage",
+    "egress"
+  ],
+  "scope": "Solo computación Linux de pago por uso; sin comparación multicloud."
+}

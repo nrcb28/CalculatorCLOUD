@@ -44,7 +44,7 @@ La revisión de interfaz y estabilidad incorpora pruebas unitarias TypeScript, p
 
 La ejecución inicial de Actions [40657232835](https://github.com/nrcb28/CalculatorCLOUD/actions/runs/40657232835) terminó correctamente con pruebas y paquetes NSIS, .deb y AppImage. Eso acredita la compilación de la versión inicial; cada revisión posterior debe pasar su propia ejecución.
 
-El proxy del entorno bloquea `prices.azure.com` (HTTP 403), por lo que **el conector Azure no ha sido probado contra el servicio real**. AWS y GCP no tienen todavía conectores de estimación. El panel de acceso comprueba los endpoints públicos de Azure y AWS y permite una prueba de GCP mediante API key efímera: no se guarda en disco. Las pruebas de navegador sustituyen IPC por dobles de prueba en determinados casos; no acreditan conexión real con los proveedores.
+El 29 de octubre de 2026 se verificó **el conector Azure contra el servicio real** para `Standard_D4s_v5` en `westeurope`: 0,23 USD/h y 167,90 USD por 730 horas para una instancia Linux de pago por uso. Solo incluye computación. Consulta la [evidencia reproducible](docs/AZURE-LIVE.md). AWS y GCP no tienen todavía conectores de estimación. El panel de acceso comprueba los endpoints públicos de Azure y AWS y permite una prueba de GCP mediante API key efímera: no se guarda en disco. Las pruebas de navegador sustituyen IPC por dobles de prueba en determinados casos; no acreditan conexión real con los proveedores.
 
 Para ejecutar todas las comprobaciones:
 
