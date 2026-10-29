@@ -1,32 +1,18 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use cloudcost_core::{
     http::{self, ConnectionError},
-    provider::{bounded_json, fetch_catalog, fresh, AZURE},
-    validation::{self, valid_input},
+    provider::{bounded_json, AZURE},
+    storage,
 };
-use rusqlite::{params, Connection, OptionalExtension};
 use serde::Serialize;
 use std::time::Duration;
 use tauri::Manager;
 
-#[derive(Serialize)]
-struct Catalog {
-    rates: Vec<serde_json::Value>,
-    fetched: String,
-    cached: bool,
-    warning: Option<String>,
-}
-fn database(app: &tauri::AppHandle) -> Result<Connection, String> {
-    let dir = app
-        .path()
+fn database_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
+    app.path()
         .app_data_dir()
-        .map_err(|_| "Directorio de datos no disponible")?;
-    std::fs::create_dir_all(&dir).map_err(|_| "No se pudo crear el directorio de datos")?;
-    let db = Connection::open(dir.join("cloudcost.db")).map_err(|_| "No se pudo abrir SQLite")?;
-    db.busy_timeout(Duration::from_secs(5))
-        .map_err(|_| "SQLite no disponible")?;
-    db.execute_batch("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, data TEXT NOT NULL, fetched TEXT NOT NULL); CREATE TABLE IF NOT EXISTS budgets (id TEXT PRIMARY KEY, data TEXT NOT NULL);").map_err(|_| "No se pudo inicializar SQLite")?;
-    Ok(db)
+        .map(|dir| dir.join("cloudcost.db"))
+        .map_err(|_| "Directorio de datos no disponible".into())
 }
 #[tauri::command]
 async fn azure_prices(
@@ -34,68 +20,8 @@ async fn azure_prices(
     sku: String,
     region: String,
     ttl_hours: u32,
-) -> Result<Catalog, ConnectionError> {
-    if !valid_input(&sku, &region, ttl_hours) {
-        return Err("SKU, región o caducidad no válidos".into());
-    }
-    let key = format!("azure:USD:{}:{}", region, sku);
-    // La conexión no cruza el await; SQLite se abre solo para lecturas/escrituras breves.
-    let saved: Option<(String, String)> = {
-        let db = database(&app)?;
-        db.query_row(
-            "SELECT data, fetched FROM cache WHERE key=?1",
-            [&key],
-            |r| Ok((r.get(0)?, r.get(1)?)),
-        )
-        .optional()
-        .map_err(|_| "No se pudo leer caché")?
-    };
-    if let Some((data, fetched)) = &saved {
-        if fresh(fetched, ttl_hours, chrono::Utc::now()) {
-            if let Ok(rates) = serde_json::from_str::<Vec<serde_json::Value>>(data) {
-                return Ok(Catalog {
-                    rates,
-                    fetched: fetched.clone(),
-                    cached: true,
-                    warning: None,
-                });
-            }
-        }
-    }
-    let result = tokio::time::timeout(Duration::from_secs(90), fetch_catalog(&sku, &region))
-        .await
-        .unwrap_or_else(|_| Err("Azure superó el tiempo máximo de consulta (90 segundos)".into()));
-    match result {
-        Ok(rates) => {
-            let fetched = chrono::Utc::now().to_rfc3339();
-            let data =
-                serde_json::to_string(&rates).map_err(|_| "No se pudo serializar catálogo")?;
-            database(&app)?
-                .execute(
-                    "INSERT OR REPLACE INTO cache(key,data,fetched) VALUES(?1,?2,?3)",
-                    params![key, data, fetched],
-                )
-                .map_err(|_| "No se pudo guardar caché")?;
-            Ok(Catalog {
-                rates,
-                fetched,
-                cached: false,
-                warning: None,
-            })
-        }
-        Err(error) => match saved {
-            Some((data, fetched)) => Ok(Catalog {
-                rates: serde_json::from_str(&data).map_err(|_| "Caché no válida")?,
-                fetched,
-                cached: true,
-                warning: Some(format!(
-                    "{} {} Se muestran tarifas de caché sin actualizar; revisa su fecha.",
-                    error.message, error.action
-                )),
-            }),
-            None => Err(error),
-        },
-    }
+) -> Result<storage::Catalog, ConnectionError> {
+    storage::azure_prices(&database_path(&app)?, &sku, &region, ttl_hours).await
 }
 #[derive(Serialize)]
 struct ConnectionStatus {
@@ -147,26 +73,11 @@ async fn check_provider(
 }
 #[tauri::command]
 fn save_budget(app: tauri::AppHandle, id: String, data: String) -> Result<(), String> {
-    let data = validation::normalize_budget(&id, &data)?;
-    database(&app)?
-        .execute(
-            "INSERT INTO budgets(id,data) VALUES(?1,?2)",
-            params![id, data],
-        )
-        .map_err(|_| "No se pudo guardar presupuesto")?;
-    Ok(())
+    storage::save_budget(&database_path(&app)?, &id, &data)
 }
 #[tauri::command]
 fn list_budgets(app: tauri::AppHandle) -> Result<Vec<String>, String> {
-    let db = database(&app)?;
-    let mut stmt = db
-        .prepare("SELECT data FROM budgets ORDER BY rowid DESC LIMIT 1000")
-        .map_err(|_| "No se pudo leer historial")?;
-    let rows = stmt
-        .query_map([], |r| r.get(0))
-        .map_err(|_| "No se pudo leer historial")?;
-    rows.collect::<Result<Vec<String>, _>>()
-        .map_err(|_| "Historial no válido".into())
+    storage::list_budgets(&database_path(&app)?)
 }
 fn main() {
     tauri::Builder::default()

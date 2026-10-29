@@ -1,0 +1,40 @@
+{
+  "firstQueryCached": false,
+  "items": 6,
+  "ok": true,
+  "reopenedQueryCached": true,
+  "retrievedAt": "2026-10-29T08:56:22.230050013+00:00",
+  "scope": "Servicios reales de caché y persistencia; sin WebView ni IPC Tauri.",
+  "snapshot": {
+    "config": {
+      "egress": 0,
+      "hours": 730,
+      "instances": 1,
+      "region": "westeurope",
+      "sku": "Standard_D4s_v5",
+      "storage": 100
+    },
+    "created": "2026-10-29T08:56:22.232279533+00:00",
+    "fetched": "2026-10-29T08:56:22.230050013+00:00",
+    "id": "sqlite-live-diagnostic",
+    "name": "Verificación Azure y SQLite",
+    "rates": [
+      {
+        "armRegionName": "westeurope",
+        "armSkuName": "Standard_D4s_v5",
+        "currencyCode": "USD",
+        "effectiveStartDate": "2021-11-01T00:00:00Z",
+        "isPrimaryMeterRegion": true,
+        "meterId": "1ab41620-5ffa-51b3-ac16-6416f9f747a9",
+        "productName": "Virtual Machines Dsv5 Series",
+        "retailPrice": 0.23,
+        "skuName": "Standard_D4s_v5",
+        "tierMinimumUnits": 0.0,
+        "type": "Consumption",
+        "unitOfMeasure": "1 Hour"
+      }
+    ]
+  },
+  "snapshotsAfterReopen": 1,
+  "source": "https://prices.azure.com/api/retail/prices"
+}

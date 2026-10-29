@@ -2,7 +2,8 @@
 
 > Verificación en vivo completada el 29 de octubre de 2026. Lee
 > [AZURE-LIVE.md](AZURE-LIVE.md) para resultados, evidencia reproducible y
-> pendientes. La guía siguiente conserva el contexto de la tarea original.
+> pendientes. La persistencia SQLite se verificó después en
+> [SQLITE-LIVE.md](SQLITE-LIVE.md). La guía siguiente conserva el contexto de la tarea original.
 
 ## Punto de partida
 

@@ -61,5 +61,6 @@ Los 100 GB de almacenamiento del escenario y el tráfico (configurado a cero)
 permanecen **sin cotizar**. Tampoco se incluyen licencias adicionales, soporte,
 descuentos, impuestos ni otros servicios. AWS/GCP carecen de conectores de
 estimación; no hay ganador multicloud. Esta ejecución no comprueba el arranque
-de instaladores, la integración de escritorio con SQLite ni la persistencia real
-de snapshots. Las compilaciones de instaladores requieren su propia CI.
+de instaladores ni el WebView/IPC de Tauri. La persistencia real de caché y
+snapshots se verificó después en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las
+compilaciones de instaladores requieren su propia CI.

@@ -25,12 +25,12 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 ## Verificación
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
-- 8 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias y exportación.
-- 9 pruebas Rust del núcleo: caché, restricciones de paginación, filtros y esquema de presupuestos.
+- 11 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
+- 20 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.
 - CI ampliada con navegador, auditoría, formato y núcleo Rust sin GUI, además de instaladores para Windows y Linux.
 
 ## Pendientes y límites
 
-No se ha probado Azure en vivo debido al bloqueo del proxy del entorno. Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. Siguen pendientes AWS/GCP de estimación, equivalencia técnica de instancias, almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de los instaladores. Los presupuestos de esta versión contienen una única tarifa de computación.
+Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. Siguen pendientes AWS/GCP de estimación, equivalencia técnica de instancias, almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de los instaladores. Los presupuestos de esta versión contienen una única tarifa de computación.
