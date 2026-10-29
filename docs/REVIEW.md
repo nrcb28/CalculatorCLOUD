@@ -25,8 +25,8 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 ## Verificación
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
-- 11 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
-- 20 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
+- 12 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
+- 30 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.
 - CI ampliada con navegador, auditoría, formato y núcleo Rust sin GUI, además de instaladores para Windows y Linux.
@@ -34,3 +34,23 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 ## Pendientes y límites
 
 Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. Siguen pendientes AWS/GCP de estimación, equivalencia técnica de instancias, almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de los instaladores. Los presupuestos de esta versión contienen una única tarifa de computación.
+
+## Revisión por fases del 29 de octubre de 2026
+
+- Se incorpora «Actualizar desde Azure»: omite la caché vigente de forma expresa.
+  «Consultar tarifas» conserva la política de caducidad configurada. Si falla
+  una actualización forzada, se conserva el catálogo anterior con un aviso.
+- Se rechazan también etiquetas DevTest, medidores Spot y campos de reserva en
+  tarifas de computación, tanto en TypeScript como al persistir en Rust.
+- Se conserva el nombre opcional del medidor en snapshots nuevos; los existentes
+  siguen siendo válidos.
+- Se aumenta la precisión decimal de operaciones y proyecciones para no truncar
+  subtotales con consumos altos admitidos por el formulario.
+- Se exige que Azure incluya `NextPageLink` (null o vacío al terminar): una
+  propiedad ausente ya no se interpreta como un catálogo completo.
+- Nueve pruebas nuevas ejercen HTTP real de loopback. No contactan Azure ni
+  modifican la política HTTPS de producción. Incluyen límites de streaming y
+  rechazo de catálogos parciales después de fallar una página posterior.
+- Se añade un recorrido nativo de Linux con WebView y comandos IPC reales:
+  importar, guardar en SQLite, reiniciar y recuperar. El resultado se comprueba
+  en CI; no equivale a probar manualmente un instalador Windows.

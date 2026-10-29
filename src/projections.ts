@@ -1,4 +1,5 @@
-import Decimal from "decimal.js";
+import DecimalBase from "decimal.js";
+const Decimal = DecimalBase.clone({ precision: 50 });
 
 // Mantener la cadena decimal hasta el último redondeo; Recharts requiere números.
 export function projectCosts(monthly: string) {

@@ -52,6 +52,9 @@ describe("cálculo y selección", () => {
     { ...r, armRegionName: "eastus" },
     { ...r, skuName: "Spot" },
     { ...r, productName: "Windows" },
+    { ...r, productName: "Virtual Machines DevTest" },
+    { ...r, meterName: "D4s v5 Spot" },
+    { ...r, reservationTerm: "1 Year" },
     { ...r, tierMinimumUnits: 100 },
     { ...r, effectiveStartDate: "2999-01-01T00:00:00Z" },
   ])("no calcula ni selecciona tarifas incompatibles %#", (value) => {
@@ -62,6 +65,13 @@ describe("cálculo y selección", () => {
     expect(
       candidates([r, { ...r, tierMinimumUnits: 100, retailPrice: 0.05 }], c),
     ).toEqual([]);
+  });
+  it("conserva los decimales con los consumos máximos admitidos", () => {
+    const value = compute(
+      { ...c, instances: 100000, hours: 743.1234567890123 },
+      { ...r, retailPrice: 999999999999.1234 },
+    );
+    expect(value.monthlyExact).toBe("74312345678836087797.777875181782");
   });
   it("descarta respuestas malformadas sin bloquear el selector", () => {
     expect(

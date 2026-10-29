@@ -5,3 +5,5 @@ src-tauri/target/
 *.db
 test-results/
 playwright-report/
+native-smoke.png
+tauri-driver.log

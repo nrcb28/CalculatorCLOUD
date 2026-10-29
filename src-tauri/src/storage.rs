@@ -30,8 +30,9 @@ pub async fn azure_prices(
     sku: &str,
     region: &str,
     ttl_hours: u32,
+    force_refresh: bool,
 ) -> Result<Catalog, ConnectionError> {
-    cached_catalog(path, sku, region, ttl_hours, || async {
+    cached_catalog(path, sku, region, ttl_hours, force_refresh, || async {
         tokio::time::timeout(Duration::from_secs(90), fetch_catalog(sku, region))
             .await
             .unwrap_or_else(|_| {
@@ -46,6 +47,7 @@ async fn cached_catalog<F, Fut>(
     sku: &str,
     region: &str,
     ttl_hours: u32,
+    force_refresh: bool,
     fetch: F,
 ) -> Result<Catalog, ConnectionError>
 where
@@ -68,7 +70,7 @@ where
         .map_err(|_| "No se pudo leer caché")?
     };
     if let Some((data, fetched)) = &saved {
-        if fresh(fetched, ttl_hours, chrono::Utc::now()) {
+        if !force_refresh && fresh(fetched, ttl_hours, chrono::Utc::now()) {
             if let Ok(rates) = serde_json::from_str::<Vec<serde_json::Value>>(data) {
                 return Ok(Catalog {
                     rates,

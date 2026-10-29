@@ -17,6 +17,37 @@ const proxyFailure: NativeFailure = {
   retryable: false,
 };
 
+test("actualizar desde Azure fuerza la red y consultar respeta la caché", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.isTauri = true;
+    w.calls = [];
+    w.__TAURI_INTERNALS__ = {
+      invoke: async (command: string, args: unknown) => {
+        w.calls.push({ command, args });
+        return { rates: [], fetched: new Date().toISOString(), cached: false };
+      },
+    };
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Calculadora", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Consultar tarifas", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("No hay tarifas");
+  await page
+    .getByRole("button", { name: "Actualizar desde Azure", exact: true })
+    .click();
+  await expect
+    .poll(() => page.evaluate(() => (window as any).calls.length))
+    .toBe(2);
+  const calls = await page.evaluate(() => (window as any).calls);
+  expect(calls[0].args.forceRefresh).toBe(false);
+  expect(calls[1].args.forceRefresh).toBe(true);
+});
+
 // IPC simulado: estas pruebas verifican la reacción de la interfaz, no una
 // conexión a Azure ni el diagnóstico del proxy real de este entorno.
 async function rejectNativeCalls(page: Page, failure: NativeFailure) {

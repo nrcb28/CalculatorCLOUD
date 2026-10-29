@@ -14,11 +14,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .enable_all()
         .build()?;
     runtime.block_on(async {
-        let live = storage::azure_prices(&path, "Standard_D4s_v5", "westeurope", 24).await?;
+        let live = storage::azure_prices(&path, "Standard_D4s_v5", "westeurope", 24, false).await?;
         if live.cached || live.rates.is_empty() {
             return Err("Se esperaba un catálogo de red en una base vacía".into());
         }
-        let cached = storage::azure_prices(&path, "Standard_D4s_v5", "westeurope", 24).await?;
+        let cached =
+            storage::azure_prices(&path, "Standard_D4s_v5", "westeurope", 24, false).await?;
         if !cached.cached || cached.fetched != live.fetched || cached.rates != live.rates {
             return Err("La reapertura no recuperó el catálogo original".into());
         }

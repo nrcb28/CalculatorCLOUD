@@ -6,8 +6,14 @@ pub const AZURE: &str = "https://prices.azure.com/api/retail/prices";
 struct Page {
     #[serde(rename = "Items")]
     items: Vec<serde_json::Value>,
-    #[serde(rename = "NextPageLink")]
+    #[serde(rename = "NextPageLink", deserialize_with = "required_next")]
     next: Option<String>,
+}
+// La propiedad ausente no acredita el final del catálogo. Solo null o "".
+fn required_next<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<String>, D::Error> {
+    Option::<String>::deserialize(deserializer)
 }
 fn valid_url(url: &url::Url) -> bool {
     url.scheme() == "https"
@@ -55,10 +61,20 @@ pub async fn fetch_catalog(
     let client = http::client(Duration::from_secs(30))?;
     let mut next = url::Url::parse(AZURE).map_err(|_| "URL no válida")?;
     next.query_pairs_mut().append_pair("api-version", "2023-01-01-preview").append_pair("currencyCode", "'USD'").append_pair("$filter", &format!("serviceName eq 'Virtual Machines' and armRegionName eq '{}' and armSkuName eq '{}' and priceType eq 'Consumption'", region, sku));
+    fetch_pages(&client, next, valid_url).await
+}
+
+// La política de destinos de producción sigue siendo valid_url; las pruebas usan
+// un servidor HTTP de loopback para ejercer el mismo transporte y paginación.
+async fn fetch_pages(
+    client: &reqwest::Client,
+    mut next: url::Url,
+    allowed: impl Fn(&url::Url) -> bool,
+) -> Result<Vec<serde_json::Value>, ConnectionError> {
     let mut all = Vec::new();
     let mut seen = std::collections::HashSet::new();
     for _ in 0..100 {
-        if !valid_url(&next) || !seen.insert(next.to_string()) {
+        if !allowed(&next) || !seen.insert(next.to_string()) {
             return Err("Paginación Azure no válida".into());
         }
         let host = next.host_str().ok_or("URL no válida")?;
@@ -132,3 +148,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod integration_tests;

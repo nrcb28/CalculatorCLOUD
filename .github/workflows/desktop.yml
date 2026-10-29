@@ -52,7 +52,7 @@ jobs:
           workspaces: src-tauri -> target
       - name: Linux prerequisites
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf xvfb dbus-x11 webkit2gtk-driver
       - run: npm ci
       - run: npm run build
       - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
@@ -62,6 +62,23 @@ jobs:
       - name: Build Linux packages
         if: runner.os == 'Linux'
         run: npm run tauri -- build --bundles deb,appimage
+      - name: Native Linux WebView and SQLite smoke
+        if: runner.os == 'Linux'
+        timeout-minutes: 10
+        run: |
+          cargo install tauri-driver --locked --root "$RUNNER_TEMP/tauri-webdriver"
+          export TAURI_DRIVER_BINARY="$RUNNER_TEMP/tauri-webdriver/bin/tauri-driver"
+          export TAURI_TEST_BINARY="$PWD/src-tauri/target/release/cloudcost-compare"
+          xvfb-run -a dbus-run-session -- bash scripts/native-smoke.sh
+      - name: Native smoke evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-smoke-Linux
+          path: |
+            native-smoke.png
+            tauri-driver.log
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
           name: cloudcost-${{ runner.os }}

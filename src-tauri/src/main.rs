@@ -20,8 +20,16 @@ async fn azure_prices(
     sku: String,
     region: String,
     ttl_hours: u32,
+    force_refresh: Option<bool>,
 ) -> Result<storage::Catalog, ConnectionError> {
-    storage::azure_prices(&database_path(&app)?, &sku, &region, ttl_hours).await
+    storage::azure_prices(
+        &database_path(&app)?,
+        &sku,
+        &region,
+        ttl_hours,
+        force_refresh.unwrap_or(false),
+    )
+    .await
 }
 #[derive(Serialize)]
 struct ConnectionStatus {

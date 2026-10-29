@@ -72,9 +72,10 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
         })
     });
     let labels = format!(
-        "{} {}",
+        "{} {} {}",
         r["productName"].as_str().unwrap_or(""),
-        r["skuName"].as_str().unwrap_or("")
+        r["skuName"].as_str().unwrap_or(""),
+        r["meterName"].as_str().unwrap_or("")
     )
     .to_lowercase();
     if ![
@@ -97,7 +98,9 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
         || r["isPrimaryMeterRegion"] != true
         || !number(&r["retailPrice"], 1e12)
         || start.is_none_or(|t| t > chrono::Utc::now().timestamp())
-        || ["windows", "spot", "low priority"]
+        || r.get("reservationTerm").is_some()
+        || (r.get("meterName").is_some() && !text(&r["meterName"], 500))
+        || ["windows", "spot", "low priority", "devtest"]
             .iter()
             .any(|w| labels.contains(w))
         || (r.get("tierMinimumUnits").is_some() && r["tierMinimumUnits"].as_f64() != Some(0.0))
@@ -128,6 +131,7 @@ pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
         &input["rates"][0],
         &[
             "meterId",
+            "meterName",
             "skuName",
             "armSkuName",
             "productName",
@@ -213,6 +217,9 @@ mod tests {
     #[test]
     fn rejects_mismatched_rates() {
         for (field, value) in [
+            ("productName", serde_json::json!("Virtual Machines DevTest")),
+            ("meterName", serde_json::json!("D4s v5 Spot")),
+            ("reservationTerm", serde_json::json!("1 Year")),
             ("currencyCode", serde_json::json!("EUR")),
             ("armRegionName", serde_json::json!("eastus")),
             ("retailPrice", serde_json::json!(-1)),

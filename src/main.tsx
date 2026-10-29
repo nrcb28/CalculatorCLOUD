@@ -157,7 +157,7 @@ function App() {
     }
     setConfig(next);
   }
-  async function refresh() {
+  async function refresh(forceRefresh = false) {
     const id = ++requestId.current;
     setBusy(true);
     setMessage("");
@@ -176,6 +176,7 @@ function App() {
         sku: config.sku,
         region: config.region,
         ttlHours: ttl,
+        forceRefresh,
       });
       if (id !== requestId.current) return;
       if (
@@ -853,14 +854,22 @@ function App() {
                       <ShieldCheck size={14} />
                       Azure Retail Prices API
                     </span>
-                    <button
-                      className="primary"
-                      disabled={busy || !!inputError}
-                      onClick={() => void refresh()}
-                    >
-                      <RefreshCw size={16} className={busy ? "spin" : ""} />
-                      {busy ? "Consultando…" : "Consultar tarifas"}
-                    </button>
+                    <div className="actions">
+                      <button
+                        disabled={busy || !!inputError}
+                        onClick={() => void refresh(true)}
+                      >
+                        Actualizar desde Azure
+                      </button>
+                      <button
+                        className="primary"
+                        disabled={busy || !!inputError}
+                        onClick={() => void refresh()}
+                      >
+                        <RefreshCw size={16} className={busy ? "spin" : ""} />
+                        {busy ? "Consultando…" : "Consultar tarifas"}
+                      </button>
+                    </div>
                   </div>
                 </section>
                 <section>

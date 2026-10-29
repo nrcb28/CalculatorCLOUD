@@ -1,4 +1,5 @@
-import Decimal from "decimal.js";
+import DecimalBase from "decimal.js";
+const Decimal = DecimalBase.clone({ precision: 50 });
 
 export const AZURE_SOURCE = "https://prices.azure.com/api/retail/prices";
 export type Config = {
@@ -22,6 +23,7 @@ export type Rate = {
   type: string;
   isPrimaryMeterRegion: boolean;
   tierMinimumUnits?: number;
+  meterName?: string;
 };
 export type Snapshot = {
   id: string;
@@ -125,6 +127,7 @@ export function isRate(value: unknown): value is Rate {
     Number.isFinite(value.retailPrice) &&
     value.retailPrice >= 0 &&
     value.retailPrice <= 1e12 &&
+    (value.meterName === undefined || text(value.meterName)) &&
     typeof value.isPrimaryMeterRegion === "boolean" &&
     date(value.effectiveStartDate, true) &&
     (value.tierMinimumUnits === undefined ||
@@ -145,7 +148,10 @@ export function eligible(r: unknown, c: Config, now = Date.now()): r is Rate {
     r.isPrimaryMeterRegion &&
     (r.tierMinimumUnits ?? 0) === 0 &&
     Date.parse(r.effectiveStartDate) <= now &&
-    !/windows|spot|low priority/i.test(r.productName + " " + r.skuName)
+    !("reservationTerm" in r) &&
+    !/windows|spot|low priority|devtest/i.test(
+      r.productName + " " + r.skuName + " " + (r.meterName ?? ""),
+    )
   );
 }
 
@@ -238,6 +244,7 @@ export function parseSnapshot(input: unknown): Snapshot {
     rates: [
       {
         meterId: rate.meterId,
+        ...(rate.meterName === undefined ? {} : { meterName: rate.meterName }),
         skuName: rate.skuName,
         armSkuName: rate.armSkuName,
         productName: rate.productName,

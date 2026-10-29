@@ -106,15 +106,25 @@ fn invalid_snapshot_never_reaches_sqlite() {
 fn fresh_cache_survives_reopen_and_avoids_network() {
     let disk = DiskDb::new();
     runtime().block_on(async {
-        let first = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-            Ok(vec![rate()])
-        })
+        let first = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            false,
+            || async { Ok(vec![rate()]) },
+        )
         .await
         .unwrap();
         assert!(!first.cached);
-        let second = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-            panic!("No debe consultar la red con caché fresca")
-        })
+        let second = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            false,
+            || async { panic!("No debe consultar la red con caché fresca") },
+        )
         .await
         .unwrap();
         assert!(second.cached);
@@ -122,7 +132,7 @@ fn fresh_cache_survives_reopen_and_avoids_network() {
         assert_eq!(second.fetched, first.fetched);
         assert_eq!(second.rates, first.rates);
         // La clave incluye SKU/región: nunca usa el catálogo de otra región.
-        let other = cached_catalog(&disk.0, "Standard_D4s_v5", "eastus", 24, || async {
+        let other = cached_catalog(&disk.0, "Standard_D4s_v5", "eastus", 24, false, || async {
             Err(offline())
         })
         .await
@@ -137,9 +147,14 @@ fn expired_and_future_cache_attempt_refresh_and_preserve_warning_on_failure() {
     for date in ["2020-01-01T00:00:00Z", "2999-01-01T00:00:00Z", "invalid"] {
         seed(&disk.0, &json!([rate()]).to_string(), date);
         runtime().block_on(async {
-            let result = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-                Err(offline())
-            })
+            let result = cached_catalog(
+                &disk.0,
+                "Standard_D4s_v5",
+                "westeurope",
+                24,
+                false,
+                || async { Err(offline()) },
+            )
             .await
             .unwrap();
             assert!(result.cached);
@@ -164,16 +179,26 @@ fn corrupted_cache_is_repaired_by_refresh_and_expired_prices_are_replaced() {
         runtime().block_on(async {
             let mut updated = rate();
             updated["retailPrice"] = json!(0.2);
-            let result = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-                Ok(vec![updated.clone()])
-            })
+            let result = cached_catalog(
+                &disk.0,
+                "Standard_D4s_v5",
+                "westeurope",
+                24,
+                false,
+                || async { Ok(vec![updated.clone()]) },
+            )
             .await
             .unwrap();
             assert!(!result.cached);
             assert!(result.warning.is_none());
-            let reopened = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-                panic!("El catálogo actualizado debe persistir")
-            })
+            let reopened = cached_catalog(
+                &disk.0,
+                "Standard_D4s_v5",
+                "westeurope",
+                24,
+                false,
+                || async { panic!("El catálogo actualizado debe persistir") },
+            )
             .await
             .unwrap();
             assert_eq!(reopened.rates, vec![updated]);
@@ -186,24 +211,73 @@ fn corrupted_cache_is_repaired_by_refresh_and_expired_prices_are_replaced() {
 fn failures_without_cache_and_invalid_filters_remain_errors() {
     let disk = DiskDb::new();
     runtime().block_on(async {
-        let invalid = cached_catalog(&disk.0, "bad'filter", "westeurope", 24, || async {
+        let invalid = cached_catalog(&disk.0, "bad'filter", "westeurope", 24, false, || async {
             panic!("Entrada inválida no debe consultar Azure")
         })
         .await;
         assert!(invalid.is_err());
         assert!(!disk.0.exists());
-        let absent = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-            Err(offline())
-        })
+        let absent = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            false,
+            || async { Err(offline()) },
+        )
         .await
         .unwrap_err();
         assert_eq!(absent.code, "connection");
         seed(&disk.0, "not json", "2020-01-01T00:00:00Z");
-        let corrupt = cached_catalog(&disk.0, "Standard_D4s_v5", "westeurope", 24, || async {
-            Err(offline())
-        })
+        let corrupt = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            false,
+            || async { Err(offline()) },
+        )
         .await
         .unwrap_err();
         assert_eq!(corrupt.message, "Caché no válida");
+    });
+}
+
+#[test]
+fn explicit_refresh_bypasses_fresh_cache_but_retains_it_on_failure() {
+    let disk = DiskDb::new();
+    seed(
+        &disk.0,
+        &json!([rate()]).to_string(),
+        &chrono::Utc::now().to_rfc3339(),
+    );
+    runtime().block_on(async {
+        let mut updated = rate();
+        updated["retailPrice"] = json!(0.3);
+        let result = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            true,
+            || async { Ok(vec![updated.clone()]) },
+        )
+        .await
+        .unwrap();
+        assert!(!result.cached);
+        assert_eq!(result.rates, vec![updated.clone()]);
+        let failed = cached_catalog(
+            &disk.0,
+            "Standard_D4s_v5",
+            "westeurope",
+            24,
+            true,
+            || async { Err(offline()) },
+        )
+        .await
+        .unwrap();
+        assert!(failed.cached);
+        assert!(failed.warning.unwrap().contains("Sin conexión"));
+        assert_eq!(failed.rates, vec![updated]);
     });
 }
