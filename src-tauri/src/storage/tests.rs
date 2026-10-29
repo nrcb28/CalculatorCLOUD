@@ -103,6 +103,23 @@ fn invalid_snapshot_never_reaches_sqlite() {
 }
 
 #[test]
+fn unreadable_sqlite_cell_does_not_hide_valid_budgets() {
+    let disk = DiskDb::new();
+    save_budget(&disk.0, "valid", &budget("valid").to_string()).unwrap();
+    database(&disk.0)
+        .unwrap()
+        .execute("INSERT INTO budgets(id,data) VALUES('damaged',X'80FF')", [])
+        .unwrap();
+    let rows = list_budgets(&disk.0).unwrap();
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0], "");
+    assert_eq!(
+        serde_json::from_str::<Value>(&rows[1]).unwrap(),
+        budget("valid")
+    );
+}
+
+#[test]
 fn fresh_cache_survives_reopen_and_avoids_network() {
     let disk = DiskDb::new();
     runtime().block_on(async {

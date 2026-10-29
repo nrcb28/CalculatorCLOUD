@@ -55,7 +55,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf xvfb dbus-x11 webkit2gtk-driver
       - run: npm ci
       - run: npm run build
-      - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - run: cargo test --locked --manifest-path src-tauri/Cargo.toml -- --nocapture
       - name: Build Windows NSIS
         if: runner.os == 'Windows'
         run: npm run tauri -- build --bundles nsis
@@ -66,7 +66,7 @@ jobs:
         if: runner.os == 'Linux'
         timeout-minutes: 10
         run: |
-          cargo install tauri-driver --locked --root "$RUNNER_TEMP/tauri-webdriver"
+          cargo install tauri-driver --version 2.1.0 --locked --root "$RUNNER_TEMP/tauri-webdriver"
           export TAURI_DRIVER_BINARY="$RUNNER_TEMP/tauri-webdriver/bin/tauri-driver"
           export TAURI_TEST_BINARY="$PWD/src-tauri/target/release/cloudcost-compare"
           xvfb-run -a dbus-run-session -- bash scripts/native-smoke.sh

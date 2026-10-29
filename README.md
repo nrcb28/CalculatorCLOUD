@@ -59,7 +59,7 @@ cargo test --locked --manifest-path src-tauri/Cargo.toml --no-default-features -
 
 Para usar el Chromium del sistema en Linux: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:e2e`.
 
-La caché y los presupuestos se han verificado también con SQLite real en disco, reapertura y una consulta Azure en vivo. Consulta [SQLITE-LIVE.md](docs/SQLITE-LIVE.md) para reproducirlo. Esta prueba no ejecuta el WebView ni el IPC de Tauri.
+La caché y los presupuestos se han verificado también con SQLite real en disco, reapertura y una consulta Azure en vivo. Consulta [SQLITE-LIVE.md](docs/SQLITE-LIVE.md) para reproducirlo. Además, la [prueba nativa Linux](docs/NATIVE-SMOKE.md) ejecuta el WebView y el IPC reales y comprueba la persistencia después de reiniciar. Las pruebas manuales de los instaladores siguen pendientes.
 
 USD es la única moneda soportada. El cálculo usa `decimal.js`; anual = mensual × 12, diario medio = mensual / 30. Horas permitidas: 0–744. Los snapshots guardan fuente, fecha y tarifa. La caché expirada se identifica y puede recuperarse si falla la red. El tema y la caducidad persisten localmente. Las fechas futuras de caché se consideran no fiables. Los errores de actualización se muestran cuando se recuperan datos guardados.
 

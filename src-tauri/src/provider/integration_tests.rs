@@ -73,7 +73,10 @@ impl Server {
     fn run(&self) -> Result<Vec<serde_json::Value>, ConnectionError> {
         let client = reqwest::Client::builder()
             .no_proxy()
-            .timeout(Duration::from_secs(3))
+            // El servidor es HTTP local: no cargar el almacén TLS de Windows
+            // en paralelo para estas pruebas. Producción conserva sus raíces.
+            .tls_built_in_root_certs(false)
+            .timeout(Duration::from_secs(10))
             .redirect(reqwest::redirect::Policy::none())
             .build()
             .unwrap();

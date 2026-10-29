@@ -6,7 +6,8 @@
 - [x] Verificar Azure contra el servicio real para un SKU/región y conservar evidencia reproducible; véase [AZURE-LIVE.md](AZURE-LIVE.md).
 - [x] Verificar caché y snapshots con SQLite en disco, reapertura y fallos de red; véase [SQLITE-LIVE.md](SQLITE-LIVE.md).
 - [x] Integración HTTP local: paginación, ciclos, límite de páginas, 429, errores permanentes, redirecciones y cuerpos inválidos o sobredimensionados.
-- [ ] Verificar WebView/IPC con prueba nativa automatizada en Linux y pruebas manuales de instaladores Windows/Linux.
+- [x] Verificar WebView/IPC/SQLite con prueba nativa automatizada en Linux; véase [NATIVE-SMOKE.md](NATIVE-SMOKE.md).
+- [ ] Pruebas manuales de instaladores Windows/Linux.
 - [ ] Integrar catálogos AWS Bulk / Query y GCP Billing; custodia mediante almacén de credenciales del SO cuando se incorporen secretos.
 - [ ] Fase 4: catálogo de especificaciones técnicas, equivalencias y precios completos de discos y red.
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
@@ -19,8 +20,8 @@ No presentar los elementos pendientes como terminados. No hay un comparador mult
 ## Orden de las siguientes fases
 
 1. **Fiabilidad y escritorio:** corregir fallos, ampliar pruebas HTTP y verificar
-   WebView/IPC/SQLite mediante tauri-driver. El control nativo Linux está añadido
-   a CI; solo se considera verificado cuando la ejecución termina correctamente.
+   WebView/IPC/SQLite mediante tauri-driver. El control nativo Linux pasó en CI el 29 de octubre de 2026 y
+   queda como comprobación obligatoria en cada revisión.
 2. **Costes Azure:** cotización de disco con tamaño/tipo/replicación explícitos y
    salida a Internet por tramos, con uso previo de cuenta y límites de cobertura.
    Persistir fuentes y selecciones sin romper los snapshots existentes.

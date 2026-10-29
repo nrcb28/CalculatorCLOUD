@@ -26,7 +26,7 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
 - 12 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
-- 30 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
+- 31 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.
 - CI ampliada con navegador, auditoría, formato y núcleo Rust sin GUI, además de instaladores para Windows y Linux.
@@ -54,3 +54,10 @@ Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZUR
 - Se añade un recorrido nativo de Linux con WebView y comandos IPC reales:
   importar, guardar en SQLite, reiniciar y recuperar. El resultado se comprueba
   en CI; no equivale a probar manualmente un instalador Windows.
+
+También se evita la conversión de importes a Number al mostrar moneda: se agrupa
+la parte entera con BigInt y se conservan los céntimos del decimal original. Una
+celda SQLite con tipo/UTF-8 ilegible se entrega como entrada inválida para que la
+interfaz pueda omitirla e informar, conservando los demás presupuestos. Pasan
+63 pruebas TypeScript. La prueba nativa de Linux se completó correctamente;
+consulta [NATIVE-SMOKE.md](NATIVE-SMOKE.md).

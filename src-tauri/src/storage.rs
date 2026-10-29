@@ -130,7 +130,9 @@ pub fn list_budgets(path: &Path) -> Result<Vec<String>, String> {
         .prepare("SELECT data FROM budgets ORDER BY rowid DESC LIMIT 1000")
         .map_err(|_| "No se pudo leer historial")?;
     let rows = stmt
-        .query_map([], |r| r.get(0))
+        // Una celda con tipo/UTF-8 dañado se envía como entrada inválida; el
+        // frontend la cuenta y omite sin perder los demás presupuestos.
+        .query_map([], |r| Ok(r.get::<_, String>(0).unwrap_or_default()))
         .map_err(|_| "No se pudo leer historial")?;
     rows.collect::<Result<Vec<String>, _>>()
         .map_err(|_| "Historial no válido".into())

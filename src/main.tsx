@@ -47,6 +47,7 @@ import {
   type Snapshot,
 } from "./engine";
 import { errorMessage } from "./errors";
+import { money } from "./money";
 import "./style.css";
 const CostCharts = lazy(() => import("./CostCharts"));
 const initial: Config = {
@@ -74,13 +75,6 @@ const descriptions: Record<string, string> = {
     "Comprueba el acceso a las fuentes oficiales de precios.",
   Preferencias: "Un espacio de trabajo a tu medida.",
 };
-const money = (amount: string, maximumFractionDigits = 2) =>
-  new Intl.NumberFormat("es-ES", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits,
-  }).format(Number(amount));
 const dateLabel = (value: string) =>
   Number.isFinite(Date.parse(value))
     ? new Date(value).toLocaleString("es-ES")
