@@ -52,6 +52,8 @@ impl Server {
                             index
                         };
                         let _ = stream.write_all(reply(index, &request).as_bytes());
+                        // Finalizar la escritura de forma explícita también en Winsock.
+                        let _ = stream.shutdown(std::net::Shutdown::Write);
                     }
                     Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
                         thread::sleep(Duration::from_millis(2));
@@ -146,8 +148,8 @@ fn rejects_pagination_cycles_and_external_destinations_before_requesting_them() 
             };
             page(json!([{"meterId":"partial"}]), json!(link))
         });
-        assert!(server.run().is_err());
-        assert_eq!(server.count(), 1);
+        let error = server.run().unwrap_err();
+        assert_eq!(server.count(), 1, "Enlace {next}: {error:?}");
     }
 }
 
@@ -178,8 +180,8 @@ fn permanent_http_failures_and_redirects_are_not_retried_or_followed() {
         let server = Server::new(move |_, _| {
             response(status, "Location: https://external.invalid/\r\n", "{}")
         });
-        assert!(server.run().is_err());
-        assert_eq!(server.count(), 1);
+        let error = server.run().unwrap_err();
+        assert_eq!(server.count(), 1, "HTTP {status}: {error:?}");
     }
 }
 
