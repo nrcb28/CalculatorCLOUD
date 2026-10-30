@@ -100,7 +100,8 @@ export default function ComponentsPanel({
               <span>Capacidad de discos / mes</span>
               <strong>{money(result.disk)}</strong>
               <small>
-                {config.instances} × {result.diskSizeGiB} GiB · mes de referencia
+                {config.instances} × {result.diskSizeGiB} GiB · mes de
+                referencia
               </small>
             </div>
             <div>

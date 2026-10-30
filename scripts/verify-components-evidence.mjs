@@ -57,6 +57,9 @@ if (prefix) {
     prefix + ".subtotal.json",
     JSON.stringify(report, null, 2) + "\n",
   );
-  writeFileSync(prefix + ".csv", csv(snapshotRows(snapshot)));
+  writeFileSync(
+    prefix + ".csv",
+    csv(snapshotRows(snapshot)).replaceAll("\r\n", "\n"),
+  );
 }
 console.log(JSON.stringify(report, null, 2));
