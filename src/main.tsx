@@ -666,8 +666,12 @@ function App() {
             <div role="status" className="notice warning">
               <Clock3 size={18} />
               <span>
-                Tarifas obsoletas o fecha de consulta futura. Última consulta:{" "}
-                {dateLabel(fetched)}. Actualiza antes de tomar una decisión.
+                Tarifas obsoletas o fecha de consulta futura. Computación:{" "}
+                {dateLabel(fetched)}.
+                {components && (
+                  <> Discos y salida: {dateLabel(components.fetched)}.</>
+                )}{" "}
+                Actualiza antes de tomar una decisión.
               </span>
             </div>
           )}
@@ -954,10 +958,12 @@ function App() {
                 config={config}
                 components={components}
                 computeMonthly={cost?.monthlyExact}
-                busy={quotingComponents || !!inputError}
+                busy={quotingComponents}
+                quoteDisabled={!!inputError}
                 onQuote={() => void quoteComponents()}
                 onRemove={() => {
                   requestId.current++;
+                  setBusy(false);
                   setComponents(undefined);
                   setQuotingComponents(false);
                 }}

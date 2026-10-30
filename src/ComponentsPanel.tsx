@@ -12,6 +12,7 @@ export default function ComponentsPanel({
   components,
   computeMonthly,
   busy,
+  quoteDisabled,
   onQuote,
   onRemove,
   onUsedChange,
@@ -20,6 +21,7 @@ export default function ComponentsPanel({
   components?: Components;
   computeMonthly?: string;
   busy: boolean;
+  quoteDisabled: boolean;
   onQuote: () => void;
   onRemove: () => void;
   onUsedChange: (amount: number) => void;
@@ -78,7 +80,7 @@ export default function ComponentsPanel({
       <div className="actions">
         <button
           onClick={onQuote}
-          disabled={busy || (!size && config.storage !== 0)}
+          disabled={busy || quoteDisabled || (!size && config.storage !== 0)}
         >
           {busy ? "Cotizando componentes…" : "Cotizar discos y red"}
         </button>

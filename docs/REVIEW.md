@@ -25,7 +25,7 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 ## Verificación
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
-- 14 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
+- 15 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
 - 36 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.

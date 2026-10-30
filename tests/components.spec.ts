@@ -99,3 +99,27 @@ test("cotiza mediante IPC y descarta una respuesta tardía tras importar", async
     page.getByRole("status").filter({ hasText: "Escenario abierto" }),
   ).toBeVisible();
 });
+
+test("permite quitar componentes fuera de cobertura y continuar con computación", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await importScenario(page, scenario);
+  await page.getByLabel("Salida a Internet (GB / mes)").fill("600000");
+  await expect(
+    page.getByRole("button", { name: "Guardar presupuesto", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", {
+      name: "Quitar cotización adicional",
+      exact: true,
+    }),
+  ).toBeEnabled();
+  await page
+    .getByRole("button", { name: "Quitar cotización adicional", exact: true })
+    .click();
+  await expect(page.getByTestId("components-total")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Guardar presupuesto", exact: true }),
+  ).toBeEnabled();
+});

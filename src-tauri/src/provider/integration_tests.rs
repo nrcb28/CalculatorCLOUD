@@ -33,6 +33,9 @@ impl Server {
             while !flag.load(Ordering::Relaxed) {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
+                        // Winsock hereda el modo no bloqueante del listener;
+                        // Linux no. Leer cabeceras completas en ambos sistemas.
+                        stream.set_nonblocking(false).unwrap();
                         stream
                             .set_read_timeout(Some(Duration::from_secs(2)))
                             .unwrap();
@@ -43,6 +46,9 @@ impl Server {
                                 Ok(0) | Err(_) => break,
                                 Ok(n) => request.extend_from_slice(&chunk[..n]),
                             }
+                        }
+                        if !request.ends_with(b"\r\n\r\n") {
+                            continue;
                         }
                         let request = String::from_utf8_lossy(&request).into_owned();
                         let index = {
@@ -95,7 +101,10 @@ impl Server {
 impl Drop for Server {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::Relaxed);
-        self.worker.take().unwrap().join().unwrap();
+        let joined = self.worker.take().unwrap().join();
+        if !std::thread::panicking() {
+            joined.expect("Falló el servidor HTTP local de pruebas");
+        }
     }
 }
 fn response(status: u16, headers: &str, body: &str) -> String {

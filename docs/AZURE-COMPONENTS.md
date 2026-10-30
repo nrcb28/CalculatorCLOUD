@@ -109,7 +109,7 @@ La evidencia guardada no se carga desde producción como precio por defecto.
 
 ## Comprobaciones
 
-78 pruebas TypeScript, 36 Rust, 14 Chromium, compilación frontend y formato.
+78 pruebas TypeScript, 36 Rust, 15 Chromium, compilación frontend y formato.
 Incluyen capacidad mínima, cero disco, fracciones de GB, cambio de tramo, uso
 previo, límites, cotizaciones parciales/ambiguas, normalización y compatibilidad
 de snapshots. El recorrido nativo Linux se amplía para guardar tanto el formato
