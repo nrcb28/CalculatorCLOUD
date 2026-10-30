@@ -9,6 +9,7 @@
 - [x] Verificar WebView/IPC/SQLite con prueba nativa automatizada en Linux; véase [NATIVE-SMOKE.md](NATIVE-SMOKE.md).
 - [ ] Pruebas manuales de instaladores Windows/Linux.
 - [ ] Integrar catálogos AWS Bulk / Query y GCP Billing; custodia mediante almacén de credenciales del SO cuando se incorporen secretos.
+- [x] Cotización opcional de capacidad Premium SSD LRS y salida MGN por tramos, con uso previo, fuentes, snapshots/CSV/SQLite y evidencia en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
 - [ ] Fase 4: catálogo de especificaciones técnicas, equivalencias y precios completos de discos y red.
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
 - [ ] Proyectos con múltiples recursos, escenarios variables, comparación histórica y generador PDF nativo con fuentes y gráficos.
@@ -24,7 +25,8 @@ No presentar los elementos pendientes como terminados. No hay un comparador mult
    queda como comprobación obligatoria en cada revisión.
 2. **Costes Azure:** cotización de disco con tamaño/tipo/replicación explícitos y
    salida a Internet por tramos, con uso previo de cuenta y límites de cobertura.
-   Persistir fuentes y selecciones sin romper los snapshots existentes.
+   Capacidad Premium SSD LRS y salida MGN completadas con persistencia compatible.
+   Quedan otros discos, rutas y cargos excluidos en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
 3. **Multicloud:** catálogo AWS público, GCP Billing con credenciales disponibles,
    especificaciones oficiales y comparación por condiciones equivalentes.
 4. **Escenarios e informes:** múltiples recursos, variación de consumo, histórico,

@@ -1,0 +1,138 @@
+{
+  "id": "azure-components-live",
+  "name": "Azure: computación, disco y salida",
+  "created": "2026-10-30T08:11:43.024Z",
+  "fetched": "2026-10-29T16:39:14.263712014+00:00",
+  "components": {
+    "model": "premium-lrs-mgn-api-v1",
+    "source": "https://prices.azure.com/api/retail/prices",
+    "fetched": "2026-10-29T16:31:59.924034209+00:00",
+    "region": "westeurope",
+    "disk": {
+      "meterId": "137d3f72-fe0e-4a78-b5d0-92d704aa3cac",
+      "meterName": "P10 LRS Disk",
+      "skuName": "P10 LRS",
+      "productName": "Premium SSD Managed Disks",
+      "armRegionName": "westeurope",
+      "unitOfMeasure": "1/Month",
+      "currencyCode": "USD",
+      "type": "Consumption",
+      "effectiveStartDate": "2018-05-01T00:00:00Z",
+      "retailPrice": 21.68,
+      "tierMinimumUnits": 0,
+      "isPrimaryMeterRegion": true
+    },
+    "network": [
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0,
+        "tierMinimumUnits": 0,
+        "isPrimaryMeterRegion": false
+      },
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0.087,
+        "tierMinimumUnits": 100,
+        "isPrimaryMeterRegion": false
+      },
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0.083,
+        "tierMinimumUnits": 10335,
+        "isPrimaryMeterRegion": false
+      },
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0.07,
+        "tierMinimumUnits": 51295,
+        "isPrimaryMeterRegion": false
+      },
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0.05,
+        "tierMinimumUnits": 153695,
+        "isPrimaryMeterRegion": false
+      },
+      {
+        "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+        "meterName": "Standard Data Transfer Out",
+        "skuName": "Standard",
+        "productName": "Rtn Preference: MGN",
+        "armRegionName": "westeurope",
+        "unitOfMeasure": "1 GB",
+        "currencyCode": "USD",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-05-01T00:00:00Z",
+        "retailPrice": 0.05,
+        "tierMinimumUnits": 512095,
+        "isPrimaryMeterRegion": false
+      }
+    ]
+  },
+  "config": {
+    "sku": "Standard_D4s_v5",
+    "region": "westeurope",
+    "instances": 1,
+    "hours": 730,
+    "storage": 100,
+    "egress": 1000,
+    "egressUsedGB": 0
+  },
+  "rates": [
+    {
+      "meterId": "1ab41620-5ffa-51b3-ac16-6416f9f747a9",
+      "meterName": "D4s v5",
+      "skuName": "Standard_D4s_v5",
+      "armSkuName": "Standard_D4s_v5",
+      "productName": "Virtual Machines Dsv5 Series",
+      "armRegionName": "westeurope",
+      "unitOfMeasure": "1 Hour",
+      "retailPrice": 0.23,
+      "currencyCode": "USD",
+      "effectiveStartDate": "2021-11-01T00:00:00Z",
+      "type": "Consumption",
+      "isPrimaryMeterRegion": true,
+      "tierMinimumUnits": 0
+    }
+  ]
+}

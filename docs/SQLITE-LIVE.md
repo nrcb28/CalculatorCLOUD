@@ -1,5 +1,8 @@
 # Persistencia real de caché y presupuestos
 
+> Esta comprobación es anterior a la cotización de capacidad de discos y salida,
+> incorporada después en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
+
 El 29 de octubre de 2026 a las 09:56 CET se ejecutó el recorrido
 Azure → SQLite en disco → reapertura de caché → snapshot → reapertura del historial.
 La [salida original](evidence/sqlite-2026-10-29.live.json) conserva la fuente,

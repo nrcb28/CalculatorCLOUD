@@ -2,7 +2,8 @@
 
 > Verificación en vivo completada el 29 de octubre de 2026. Lee
 > [AZURE-LIVE.md](AZURE-LIVE.md) para resultados, evidencia reproducible y
-> pendientes. La persistencia SQLite se verificó después en
+> pendientes. La siguiente fase Azure de capacidad de discos y salida se documenta en
+> [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md). La persistencia SQLite se verificó después en
 > [SQLITE-LIVE.md](SQLITE-LIVE.md). La guía siguiente conserva el contexto de la tarea original.
 
 ## Punto de partida

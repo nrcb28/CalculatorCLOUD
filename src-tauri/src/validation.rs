@@ -13,11 +13,11 @@ pub fn valid_input(sku: &str, region: &str, ttl: u32) -> bool {
         && (1..=720).contains(&ttl)
 }
 
-fn text(v: &Value, max: usize) -> bool {
+pub(crate) fn text(v: &Value, max: usize) -> bool {
     v.as_str()
         .is_some_and(|s| !s.trim().is_empty() && s.encode_utf16().count() <= max)
 }
-fn timestamp(s: &str) -> Option<chrono::DateTime<chrono::FixedOffset>> {
+pub(crate) fn timestamp(s: &str) -> Option<chrono::DateTime<chrono::FixedOffset>> {
     if s.len() > 40 {
         return None;
     }
@@ -25,10 +25,10 @@ fn timestamp(s: &str) -> Option<chrono::DateTime<chrono::FixedOffset>> {
         .ok()
         .filter(|d| d.timestamp_subsec_nanos() < 1_000_000_000)
 }
-fn date(v: &Value) -> bool {
+pub(crate) fn date(v: &Value) -> bool {
     v.as_str().is_some_and(|s| timestamp(s).is_some())
 }
-fn number(v: &Value, max: f64) -> bool {
+pub(crate) fn number(v: &Value, max: f64) -> bool {
     v.as_f64()
         .is_some_and(|n| n.is_finite() && n >= 0.0 && n <= max)
 }
@@ -56,6 +56,7 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
         || !number(&c["hours"], 744.0)
         || !number(&c["storage"], 1e9)
         || !number(&c["egress"], 1e9)
+        || (c.get("egressUsedGB").is_some() && !number(&c["egressUsedGB"], 1e9))
     {
         return Err("Consumos no válidos".into());
     }
@@ -107,6 +108,9 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
     {
         return Err("Tarifa incompatible con el presupuesto".into());
     }
+    if let Some(components) = v.get("components") {
+        crate::components::normalize(components, c)?;
+    }
     Ok(())
 }
 // Persistir solo el esquema permitido, también cuando el comando se invoca sin el frontend.
@@ -125,7 +129,15 @@ pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
     let mut output = select(&input, &["id", "name", "created", "fetched"]);
     output["config"] = select(
         &input["config"],
-        &["sku", "region", "instances", "hours", "storage", "egress"],
+        &[
+            "sku",
+            "region",
+            "instances",
+            "hours",
+            "storage",
+            "egress",
+            "egressUsedGB",
+        ],
     );
     output["rates"] = Value::Array(vec![select(
         &input["rates"][0],
@@ -145,6 +157,12 @@ pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
             "tierMinimumUnits",
         ],
     )]);
+    if let Some(components) = input.get("components") {
+        if input["config"].get("egressUsedGB").is_none() {
+            output["config"]["egressUsedGB"] = serde_json::json!(0);
+        }
+        output["components"] = crate::components::normalize(components, &input["config"])?;
+    }
     serde_json::to_string(&output).map_err(|_| "No se pudo serializar el presupuesto".into())
 }
 #[cfg(test)]

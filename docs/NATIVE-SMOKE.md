@@ -13,7 +13,9 @@ Con tauri-driver 2.1.0, WebKitWebDriver, Xvfb y D-Bus, la prueba:
 3. Pulsa «Guardar presupuesto» y espera la confirmación del comando Rust real.
 4. Cierra la sesión y abre de nuevo la aplicación.
 5. Consulta el historial SQLite mediante IPC y reabre el escenario.
-6. Comprueba el importe de 146,00 USD de la fixture y guarda una captura.
+6. El recorrido ampliado guarda también un escenario con disco y red, conserva
+   ambos presupuestos y recupera 266,00 USD del escenario nuevo después de reiniciar.
+   Los importes son sintéticos exclusivos de prueba. Se guarda una captura.
 
 No se reemplazan los comandos IPC. El directorio XDG temporal permanece entre
 las dos sesiones y se elimina al terminar; nunca se usa una base del usuario.

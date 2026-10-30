@@ -58,10 +58,34 @@ pub async fn fetch_catalog(
     if !crate::validation::valid_input(sku, region, 24) {
         return Err("SKU o región no válidos".into());
     }
+    fetch_filtered(&format!("serviceName eq 'Virtual Machines' and armRegionName eq '{}' and armSkuName eq '{}' and priceType eq 'Consumption'", region, sku)).await
+}
+
+async fn fetch_filtered(filter: &str) -> Result<Vec<serde_json::Value>, ConnectionError> {
     let client = http::client(Duration::from_secs(30))?;
     let mut next = url::Url::parse(AZURE).map_err(|_| "URL no válida")?;
-    next.query_pairs_mut().append_pair("api-version", "2023-01-01-preview").append_pair("currencyCode", "'USD'").append_pair("$filter", &format!("serviceName eq 'Virtual Machines' and armRegionName eq '{}' and armSkuName eq '{}' and priceType eq 'Consumption'", region, sku));
+    next.query_pairs_mut()
+        .append_pair("api-version", "2023-01-01-preview")
+        .append_pair("currencyCode", "'USD'")
+        .append_pair("$filter", filter);
     fetch_pages(&client, next, valid_url).await
+}
+
+/// Catálogos de capacidad Premium SSD LRS y salida estándar por red Microsoft.
+/// Se consultan por separado del catálogo VM; no se reutiliza su caducidad.
+pub async fn fetch_components(region: &str) -> Result<serde_json::Value, ConnectionError> {
+    if !crate::validation::valid_input("components", region, 24) {
+        return Err("Región no válida".into());
+    }
+    tokio::time::timeout(Duration::from_secs(90), async {
+        let disks = fetch_filtered(&format!("serviceName eq 'Storage' and armRegionName eq '{}' and productName eq 'Premium SSD Managed Disks' and priceType eq 'Consumption'", region)).await?;
+        let network = fetch_filtered(&format!("serviceName eq 'Bandwidth' and armRegionName eq '{}' and productName eq 'Rtn Preference: MGN' and skuName eq 'Standard' and meterName eq 'Standard Data Transfer Out' and priceType eq 'Consumption'", region)).await?;
+        Ok(serde_json::json!({"source":AZURE,"region":region,"fetched":chrono::Utc::now().to_rfc3339(),"diskRates":disks,"networkRates":network}))
+    }).await.unwrap_or_else(|_| Err(ConnectionError {
+        code:"timeout".into(), message:"La consulta de discos y red superó 90 segundos.".into(),
+        action:"Comprueba la conectividad y vuelve a intentarlo.".into(),
+        host:Some("prices.azure.com".into()),retryable:true,
+    }))
 }
 
 // La política de destinos de producción sigue siendo valid_url; las pruebas usan

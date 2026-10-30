@@ -1,3 +1,9 @@
+import { date } from "./dates.ts";
+import {
+  parseComponents,
+  computeComponents,
+  type Components,
+} from "./components.ts";
 import DecimalBase from "decimal.js";
 const Decimal = DecimalBase.clone({ precision: 50 });
 
@@ -9,6 +15,7 @@ export type Config = {
   hours: number;
   storage: number;
   egress: number;
+  egressUsedGB?: number;
 };
 export type Rate = {
   meterId: string;
@@ -32,52 +39,12 @@ export type Snapshot = {
   config: Config;
   rates: Rate[];
   fetched: string;
+  components?: Components;
 };
 const record = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
 const text = (value: unknown, limit = 500): value is string =>
   typeof value === "string" && value.trim().length > 0 && value.length <= limit;
-// Date.parse también acepta "1" y normaliza fechas imposibles como 30 de
-// febrero. El backend usa RFC3339: validamos el calendario antes de convertir.
-const date = (value: unknown, allowDateOnly = false): value is string => {
-  if (typeof value !== "string" || value.length > 40) return false;
-  const parts =
-    /^(\d{4})-(\d{2})-(\d{2})(?:[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?([Zz]|[+-]\d{2}:\d{2}))?$/.exec(
-      value,
-    );
-  if (!parts) return false;
-  const [
-    ,
-    yearText,
-    monthText,
-    dayText,
-    hourText,
-    minuteText,
-    secondText,
-    ,
-    zone,
-  ] = parts;
-  const year = Number(yearText),
-    month = Number(monthText),
-    day = Number(dayText);
-  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (month < 1 || month > 12 || day < 1 || day > days[month - 1]) return false;
-  if (hourText === undefined) return allowDateOnly;
-  if (
-    Number(hourText) > 23 ||
-    Number(minuteText) > 59 ||
-    Number(secondText) > 59
-  )
-    return false;
-  if (
-    zone !== "Z" &&
-    zone !== "z" &&
-    (Number(zone.slice(1, 3)) > 23 || Number(zone.slice(4, 6)) > 59)
-  )
-    return false;
-  return Number.isFinite(Date.parse(value));
-};
 
 export function validate(value: unknown): asserts value is Config {
   if (
@@ -106,6 +73,14 @@ export function validate(value: unknown): asserts value is Config {
     (value.hours as number) > 744
   )
     throw Error("Instancias: entero entre 1 y 100000; horas: entre 0 y 744");
+  if (
+    value.egressUsedGB !== undefined &&
+    (typeof value.egressUsedGB !== "number" ||
+      !Number.isFinite(value.egressUsedGB) ||
+      value.egressUsedGB < 0 ||
+      value.egressUsedGB > 1e9)
+  )
+    throw Error("Salida previa: número finito entre 0 y 1000000000 GB");
   if ((value.storage as number) > 1e9 || (value.egress as number) > 1e9)
     throw Error("Almacenamiento y tráfico: máximo 1000000000");
 }
@@ -233,6 +208,9 @@ export function parseSnapshot(input: unknown): Snapshot {
     name: input.name,
     created: input.created,
     fetched: input.fetched,
+    ...(input.components === undefined
+      ? {}
+      : { components: parseComponents(input.components, config) }),
     config: {
       sku: config.sku,
       region: config.region,
@@ -240,6 +218,11 @@ export function parseSnapshot(input: unknown): Snapshot {
       hours: config.hours,
       storage: config.storage,
       egress: config.egress,
+      ...(config.egressUsedGB === undefined
+        ? input.components === undefined
+          ? {}
+          : { egressUsedGB: 0 }
+        : { egressUsedGB: config.egressUsedGB }),
     },
     rates: [
       {
@@ -287,4 +270,80 @@ export function csv(rows: string[][]) {
       )
       .join("\r\n")
   );
+}
+
+export function snapshotRows(s: Snapshot): string[][] {
+  const checked = parseSnapshot(s);
+  const r = checked.rates[0],
+    c = checked.config;
+  const vm = compute(c, r);
+  const rows = [
+    [
+      "Componente",
+      "Proveedor",
+      "SKU / medidor",
+      "Región",
+      "Mensual USD",
+      "Anual USD",
+      "Fuente",
+      "Consulta",
+      "Vigencia",
+      "Condiciones",
+    ],
+    [
+      "Computación",
+      "Azure",
+      r.armSkuName,
+      c.region,
+      vm.monthly,
+      vm.annual,
+      AZURE_SOURCE,
+      checked.fetched,
+      r.effectiveStartDate,
+      `${c.instances} instancias × ${c.hours} horas; Linux PAYG`,
+    ],
+  ];
+  if (checked.components) {
+    const q = checked.components,
+      amount = computeComponents(c, q, vm.monthlyExact);
+    rows.push(
+      [
+        "Capacidad de discos",
+        "Azure",
+        q.disk?.meterName ?? "Sin disco solicitado",
+        c.region,
+        amount.disk,
+        amount.diskAnnual,
+        q.source,
+        q.fetched,
+        q.disk?.effectiveStartDate ?? "",
+        `${c.instances} discos de ${amount.diskSizeGiB} GiB; Premium SSD LRS; mes de referencia; sin bursting/snapshots`,
+      ],
+      [
+        "Salida a Internet",
+        "Azure",
+        q.network[0].meterId,
+        c.region,
+        amount.network,
+        amount.networkAnnual,
+        q.source,
+        q.fetched,
+        q.network[0].effectiveStartDate,
+        `${c.egress} GB incrementales; ${c.egressUsedGB ?? 0} GB previos; MGN; límites API distintos de tabla web; verificar condiciones Azure; tramos: ${amount.bands.map((b) => `${b.quantity} × ${b.price}`).join(" + ")}`,
+      ],
+      [
+        "Subtotal cotizado",
+        "Azure",
+        "Computación + capacidad de discos + salida",
+        c.region,
+        amount.monthly,
+        amount.annual,
+        AZURE_SOURCE,
+        q.fetched,
+        "",
+        "Sin impuestos, licencias adicionales, IP/NAT ni otros servicios; anual = 12 meses con idéntico uso previo",
+      ],
+    );
+  }
+  return rows;
 }

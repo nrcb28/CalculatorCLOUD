@@ -1,5 +1,8 @@
 # Verificación Azure en vivo — 29 de octubre de 2026
 
+> Esta comprobación es anterior a la cotización de capacidad de discos y salida,
+> incorporada después en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
+
 El conector de producción respondió correctamente: salida 0, `ok: true`, seis
 tarifas horarias USD para `Standard_D4s_v5` en `westeurope`. Consulta realizada a
 las 09:52:19 CET (08:52:19 UTC). TLS y proxy heredados, sin credenciales Azure.

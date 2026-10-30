@@ -20,12 +20,12 @@ npm run desktop
 ## Uso
 
 1. Abre Calculadora y especifica un SKU Azure y una región admitida (por ejemplo `Standard_D4s_v5`, `westeurope`). Verifica sus vCPU/RAM en la documentación de Azure.
-2. Configura instancias, horas y necesidades de almacenamiento/red.
+2. Configura instancias, horas, GiB de disco por instancia y GB de salida. Para incluir capacidad Premium SSD LRS y salida MGN, introduce el tráfico previo de la cuenta y pulsa «Cotizar discos y red».
 3. Consulta tarifas oficiales. Selecciona expresamente un producto de la lista para calcular su computación Linux de pago por uso.
 4. Consulta proyecciones, guarda snapshots y exporta CSV/JSON. La impresión del sistema permite guardar PDF donde esté disponible; no hay generador PDF nativo.
 5. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo.
 
-No hay datos ficticios en producción. Sin una tarifa real no se muestra un importe. Los únicos valores sintéticos están en pruebas. La tarifa no acredita equivalencia de rendimiento. Almacenamiento y tráfico **no se incluyen** en el subtotal, ni soporte, licencias, reservas, descuentos, impuestos u otros servicios. No se declara ganador mientras falte cobertura multicloud.
+No hay datos ficticios en producción. Sin una tarifa real no se muestra un importe. Los únicos valores sintéticos están en pruebas. La tarifa no acredita equivalencia de rendimiento. Sin cotización adicional, el subtotal incluye solo computación. Con ella se suman capacidad Premium SSD LRS por un mes de referencia y salida MGN por tramos; consulta [condiciones y evidencia](docs/AZURE-COMPONENTS.md). No incluye bursting, snapshots, soporte, licencias adicionales, reservas, descuentos, impuestos ni otros servicios. No se declara ganador mientras falte cobertura multicloud.
 
 ## Instaladores
 

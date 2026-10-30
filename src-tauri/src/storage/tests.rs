@@ -103,6 +103,21 @@ fn invalid_snapshot_never_reaches_sqlite() {
 }
 
 #[test]
+fn optional_component_quotes_and_prior_usage_survive_sqlite_reopening() {
+    let disk = DiskDb::new();
+    let mut value = budget("components");
+    let quote: Value =
+        serde_json::from_str(include_str!("../../../tests/components-fixture.json")).unwrap();
+    value["components"] = quote.clone();
+    value["config"]["egressUsedGB"] = json!(100);
+    save_budget(&disk.0, "components", &value.to_string()).unwrap();
+    let rows = list_budgets(&disk.0).unwrap();
+    let reopened: Value = serde_json::from_str(&rows[0]).unwrap();
+    assert_eq!(reopened["components"], quote);
+    assert_eq!(reopened["config"]["egressUsedGB"], 100);
+}
+
+#[test]
 fn unreadable_sqlite_cell_does_not_hide_valid_budgets() {
     let disk = DiskDb::new();
     save_budget(&disk.0, "valid", &budget("valid").to_string()).unwrap();

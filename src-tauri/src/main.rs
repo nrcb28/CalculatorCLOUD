@@ -1,7 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use cloudcost_core::{
     http::{self, ConnectionError},
-    provider::{bounded_json, AZURE},
+    provider::{bounded_json, fetch_components, AZURE},
     storage,
 };
 use serde::Serialize;
@@ -30,6 +30,10 @@ async fn azure_prices(
         force_refresh.unwrap_or(false),
     )
     .await
+}
+#[tauri::command]
+async fn azure_components(region: String) -> Result<serde_json::Value, ConnectionError> {
+    fetch_components(&region).await
 }
 #[derive(Serialize)]
 struct ConnectionStatus {
@@ -91,6 +95,7 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             azure_prices,
+            azure_components,
             check_provider,
             save_budget,
             list_budgets

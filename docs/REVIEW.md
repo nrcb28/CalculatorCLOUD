@@ -25,8 +25,8 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 ## Verificación
 
 - Pruebas TypeScript: cálculo decimal, importación, selección, caducidad y CSV.
-- 12 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
-- 31 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
+- 14 pruebas Chromium: navegación/tema/menú, consumos inválidos, importaciones, fila corrupta/IDs, respuesta tardía, borrado de API key, preferencias, exportación y diagnósticos de proxy/TLS.
+- 36 pruebas Rust del núcleo: HTTP, caché, restricciones de paginación, filtros, esquema de presupuestos y seis pruebas nuevas con SQLite en disco.
 - Compilación frontend y revisión visual en Chromium.
 - `npm audit`: cero vulnerabilidades al revisar el árbol actualizado.
 - CI ampliada con navegador, auditoría, formato y núcleo Rust sin GUI, además de instaladores para Windows y Linux.
@@ -61,3 +61,10 @@ celda SQLite con tipo/UTF-8 ilegible se entrega como entrada inválida para que 
 interfaz pueda omitirla e informar, conservando los demás presupuestos. Pasan
 63 pruebas TypeScript. La prueba nativa de Linux se completó correctamente;
 consulta [NATIVE-SMOKE.md](NATIVE-SMOKE.md).
+
+## Capacidad de discos y salida Azure
+
+La fase adicional y su evidencia están en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
+Se conservan las tarifas, condiciones y uso previo en JSON/SQLite/CSV. Los
+formatos antiguos siguen siendo válidos. El resumen cotizado incluye componentes;
+los gráficos y comparación identifican su alcance de computación.

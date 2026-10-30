@@ -1,7 +1,7 @@
 // Prueba de WebView e IPC reales mediante tauri-driver / WebKitWebDriver.
 // No sustituye __TAURI_INTERNALS__ ni utiliza Azure o datos de producción.
 import assert from "node:assert/strict";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 const application = process.env.TAURI_TEST_BINARY;
 assert.ok(
@@ -93,13 +93,49 @@ try {
   await waitFor(
     "return document.body.textContent.includes('Presupuesto guardado con una copia')",
   );
+  // Guardar también el esquema ampliado sin sustituir el escenario antiguo.
+  await click("Presupuestos");
+  await waitFor(
+    "return document.body.textContent.includes('Importar JSON') && !document.body.textContent.includes('Cargando presupuestos…')",
+  );
+  const components = JSON.parse(
+    readFileSync(
+      new URL("../tests/components-fixture.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  await execute(
+    `
+    const input = document.querySelector('input[type=file]');
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([JSON.stringify(arguments[0])], 'components.json', {type:'application/json'}));
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', {bubbles:true}));
+  `,
+    [
+      {
+        ...fixture,
+        config: { ...fixture.config, egress: 1000, egressUsedGB: 100 },
+        components,
+      },
+    ],
+  );
+  await waitFor(
+    "return document.querySelector('[data-testid=components-total]')?.textContent.includes('266,00')",
+  );
+  await click("Guardar presupuesto");
+  await waitFor(
+    "return document.body.textContent.includes('Presupuesto guardado con una copia')",
+  );
   await close();
   // Nueva ventana/proceso con el mismo directorio: leer de SQLite tras reiniciar.
   await start();
   await click("Presupuestos");
-  await waitFor("return document.querySelectorAll('.history').length === 1");
+  await waitFor("return document.querySelectorAll('.history').length === 2");
   await click("Abrir escenario");
-  await waitFor("return document.body.textContent.includes('146,00')");
+  await waitFor(
+    "return document.querySelector('[data-testid=components-total]')?.textContent.includes('266,00')",
+  );
   const screenshot = await request(
     `/session/${session}/screenshot`,
     undefined,

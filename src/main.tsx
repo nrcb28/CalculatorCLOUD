@@ -1,3 +1,9 @@
+import ComponentsPanel from "./ComponentsPanel";
+import {
+  selectComponents,
+  computeComponents,
+  type Components,
+} from "./components";
 import React, { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { invoke, isTauri } from "@tauri-apps/api/core";
@@ -42,6 +48,7 @@ import {
   validate,
   parseSnapshot,
   csv,
+  snapshotRows,
   type Config,
   type Rate,
   type Snapshot,
@@ -104,6 +111,8 @@ function App() {
     [rates, setRates] = useState<Rate[]>([]),
     [fetched, setFetched] = useState(""),
     [selected, setSelected] = useState("");
+  const [components, setComponents] = useState<Components>();
+  const [quotingComponents, setQuotingComponents] = useState(false);
   const [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [history, setHistory] = useState<Snapshot[]>([]),
@@ -136,14 +145,24 @@ function App() {
   let inputError = "";
   try {
     validate(config);
+    if (components) computeComponents(config, components);
   } catch (e) {
     inputError = (e as Error).message;
   }
   const cost = rate && !inputError ? compute(config, rate) : null,
-    stale = !!fetched && isStale(fetched, ttl, now);
+    stale =
+      (!!fetched && isStale(fetched, ttl, now)) ||
+      (!!components && isStale(components.fetched, ttl, now));
+  const summary =
+    cost && components
+      ? computeComponents(config, components, cost.monthlyExact)
+      : cost;
   function changeConfig(next: Config) {
     requestId.current++;
     setBusy(false);
+    setQuotingComponents(false);
+    if (next.region !== config.region || next.storage !== config.storage)
+      setComponents(undefined);
     if (next.sku !== config.sku || next.region !== config.region) {
       setSelected("");
       setRates([]);
@@ -154,6 +173,7 @@ function App() {
   async function refresh(forceRefresh = false) {
     const id = ++requestId.current;
     setBusy(true);
+    setQuotingComponents(false);
     setMessage("");
     try {
       validate(config);
@@ -200,6 +220,34 @@ function App() {
       if (id === requestId.current) setBusy(false);
     }
   }
+  async function quoteComponents() {
+    const id = ++requestId.current;
+    setBusy(false);
+    setQuotingComponents(true);
+    setMessage("");
+    try {
+      validate(config);
+      if (!isTauri())
+        throw Error(
+          "Cotizar discos y red requiere la aplicación de escritorio",
+        );
+      const raw = await invoke<unknown>("azure_components", {
+        region: config.region,
+      });
+      if (id !== requestId.current) return;
+      const next = selectComponents(raw, config);
+      computeComponents(config, next);
+      setComponents(next);
+      setNow(Date.now());
+      setMessage(
+        "Capacidad Premium SSD LRS y salida MGN cotizadas desde Azure. Revisa las condiciones y los tramos.",
+      );
+    } catch (e) {
+      if (id === requestId.current) setMessage(errorMessage(e));
+    } finally {
+      if (id === requestId.current) setQuotingComponents(false);
+    }
+  }
   async function loadHistory() {
     setLoadingHistory(true);
     try {
@@ -240,6 +288,7 @@ function App() {
       config,
       rates: [rate],
       fetched,
+      ...(components === undefined ? {} : { components }),
     });
   }
   async function save() {
@@ -259,6 +308,8 @@ function App() {
   function restore(s: Snapshot) {
     requestId.current++;
     setBusy(false);
+    setQuotingComponents(false);
+    setComponents(s.components);
     setConfig(s.config);
     setRates(s.rates);
     setFetched(s.fetched);
@@ -305,33 +356,7 @@ function App() {
           JSON.stringify(s, null, 2),
           "application/json",
         );
-      else
-        download(
-          "costes.csv",
-          csv([
-            [
-              "Proveedor",
-              "SKU",
-              "Región",
-              "Mensual USD (solo computación)",
-              "Anual USD (solo computación)",
-              "Fuente",
-              "Consulta",
-              "Vigencia",
-            ],
-            [
-              "Azure",
-              rate!.armSkuName,
-              rate!.armRegionName,
-              cost!.monthly,
-              cost!.annual,
-              "https://prices.azure.com/api/retail/prices",
-              fetched,
-              rate!.effectiveStartDate,
-            ],
-          ]),
-          "text/csv",
-        );
+      else download("costes.csv", csv(snapshotRows(s)), "text/csv");
     } catch (e) {
       setMessage(errorMessage(e));
     }
@@ -362,31 +387,37 @@ function App() {
     <div className="metrics">
       <article className="metric">
         <div className="metric-top">
-          <span>Computación mensual</span>
+          <span>
+            {components ? "Subtotal cotizado mensual" : "Computación mensual"}
+          </span>
           <div className="icon-tile purple">
             <Server size={17} />
           </div>
         </div>
         <h2>
-          {cost ? money(cost.monthly) : "—"}
-          {cost && <span>/ mes</span>}
+          {summary ? money(summary.monthly) : "—"}
+          {summary && <span>/ mes</span>}
         </h2>
         <small>Subtotal en USD · sin impuestos</small>
         <div className="metric-note">
           <span className="dot purple-dot" />
-          {cost ? "Tarifa seleccionada" : "Pendiente de una tarifa oficial"}
+          {summary ? "Tarifa seleccionada" : "Pendiente de una tarifa oficial"}
         </div>
       </article>
       <article className="metric">
         <div className="metric-top">
-          <span>Proyección anual</span>
+          <span>
+            {components
+              ? "Subtotal cotizado anual"
+              : "Proyección anual de computación"}
+          </span>
           <div className="icon-tile blue">
             <ChartNoAxesCombined size={18} />
           </div>
         </div>
         <h2>
-          {cost ? money(cost.annual) : "—"}
-          {cost && <span>/ año</span>}
+          {summary ? money(summary.annual) : "—"}
+          {summary && <span>/ año</span>}
         </h2>
         <small>12 meses con el mismo consumo</small>
         <div className="metric-note">
@@ -404,10 +435,16 @@ function App() {
         <h2 className="coverage-title">
           Parcial <span className="badge amber-badge">Sin ganador</span>
         </h2>
-        <small>Solo computación Azure disponible</small>
+        <small>
+          {components
+            ? "Computación, capacidad de disco y salida Azure"
+            : "Computación Azure; componentes opcionales"}
+        </small>
         <div className="metric-note">
           <Info size={12} />
-          Discos y red pendientes de cotizar
+          {components
+            ? "Condiciones y exclusiones en la calculadora"
+            : "Discos y red pendientes de cotizar"}
         </div>
       </article>
     </div>
@@ -497,7 +534,7 @@ function App() {
         <Info size={15} />
         <span>
           Igualar vCPU y RAM no garantiza igual rendimiento. Faltan precios de
-          almacenamiento y red: no se puede determinar un ganador.
+          otros proveedores y servicios: no se puede determinar un ganador.
         </span>
       </div>
     </section>
@@ -700,9 +737,13 @@ function App() {
                     </div>
                     <div>
                       <strong>Almacenamiento</strong>
-                      <small>{config.storage} GiB solicitados</small>
+                      <small>
+                        {config.storage} GiB solicitados por instancia
+                      </small>
                     </div>
-                    <span className="badge">Sin tarifa</span>
+                    <span className="badge">
+                      {components ? "Cotizados" : "Sin tarifa"}
+                    </span>
                   </div>
                   <div className="scope-row">
                     <div className="icon-tile">
@@ -712,7 +753,9 @@ function App() {
                       <strong>Red</strong>
                       <small>{config.egress} GB de salida / mes</small>
                     </div>
-                    <span className="badge">Sin tarifa</span>
+                    <span className="badge">
+                      {components ? "Cotizados" : "Sin tarifa"}
+                    </span>
                   </div>
                   <div className="scope-note">
                     <Info size={16} />
@@ -806,14 +849,16 @@ function App() {
                   </div>
                   <div className="form-divider">
                     <span>02</span>Necesidades adicionales{" "}
-                    <span className="form-caption">Sin coste calculado</span>
+                    <span className="form-caption">
+                      Cotización adicional opcional
+                    </span>
                   </div>
                   <div className="form">
                     {(["storage", "egress"] as const).map((k, i) => (
                       <label key={k}>
                         {
                           [
-                            "Almacenamiento (GiB)",
+                            "Disco por instancia (GiB)",
                             "Salida a Internet (GB / mes)",
                           ][i]
                         }
@@ -898,12 +943,28 @@ function App() {
                   <div className="scope-note">
                     <Info size={16} />
                     <p>
-                      Sin almacenamiento, tráfico, licencias, soporte,
-                      descuentos ni impuestos.
+                      Gráficos y proyecciones de computación. El subtotal con
+                      discos y salida se muestra en su cotización adicional. Sin
+                      licencias adicionales, soporte ni impuestos.
                     </p>
                   </div>
                 </section>
               </div>
+              <ComponentsPanel
+                config={config}
+                components={components}
+                computeMonthly={cost?.monthlyExact}
+                busy={quotingComponents || !!inputError}
+                onQuote={() => void quoteComponents()}
+                onRemove={() => {
+                  requestId.current++;
+                  setComponents(undefined);
+                  setQuotingComponents(false);
+                }}
+                onUsedChange={(amount) =>
+                  changeConfig({ ...config, egressUsedGB: amount })
+                }
+              />
               <section>
                 <div className="section-title">
                   <div>
@@ -1029,7 +1090,8 @@ function App() {
                     <div>
                       <h3>Desglose disponible</h3>
                       <p>
-                        Solo computación Azure; discos y red no están incluidos.
+                        Gráfico de computación Azure. Los discos y la salida se
+                        detallan en la calculadora.
                       </p>
                     </div>
                   </div>
