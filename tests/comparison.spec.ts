@@ -42,11 +42,13 @@ test("consulta AWS, conserva región manual y descarta respuestas al salir", asy
     page.getByLabel("Clave API efímera de Cloud Billing"),
   ).toHaveValue("");
   await page.getByRole("button", { name: "Presupuestos", exact: true }).click();
-  await page.getByLabel("Importar presupuesto JSON").setInputFiles({
-    name: "legacy.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(JSON.stringify(fixture)),
-  });
+  await page
+    .getByLabel("Importar presupuesto JSON", { exact: true })
+    .setInputFiles({
+      name: "legacy.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(fixture)),
+    });
   await page.evaluate((q) => (window as any).finishQuote(q), quote);
   await page.getByRole("button", { name: "Comparador", exact: true }).click();
   await expect(page.locator(".comparison tbody tr")).toHaveCount(0);
@@ -56,13 +58,15 @@ test("importa y exporta una alternativa sin alterar el subtotal Azure", async ({
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Presupuestos", exact: true }).click();
-  await page.getByLabel("Importar presupuesto JSON").setInputFiles({
-    name: "multi.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(
-      JSON.stringify({ ...fixture, comparisonQuotes: [quote] }),
-    ),
-  });
+  await page
+    .getByLabel("Importar presupuesto JSON", { exact: true })
+    .setInputFiles({
+      name: "multi.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(
+        JSON.stringify({ ...fixture, comparisonQuotes: [quote] }),
+      ),
+    });
   await expect(page.locator(".metric").first()).toContainText("146,00");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "JSON", exact: true }).click();

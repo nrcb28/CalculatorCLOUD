@@ -271,7 +271,10 @@ export function csv(rows: string[][]) {
           .map(
             (value) =>
               '"' +
-              (/^[\s\u0000-\u001f]*[=+@-]|^[\t\r\n]/.test(value) ? "'" : "") +
+              (!/^-\d+(?:\.\d+)?$/.test(value) &&
+              /^[\s\u0000-\u001f]*[=+@-]|^[\t\r\n]/.test(value)
+                ? "'"
+                : "") +
               value.replaceAll('"', '""') +
               '"',
           )

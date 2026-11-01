@@ -1,5 +1,5 @@
 // Prueba de WebView e IPC reales mediante tauri-driver / WebKitWebDriver.
-// No sustituye __TAURI_INTERNALS__ ni utiliza Azure o datos de producción.
+// No sustituye __TAURI_INTERNALS__ ni consulta proveedores: utiliza escenarios de prueba y una tarifa pública capturada.
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -147,6 +147,17 @@ try {
   await click("Comparador");
   await waitFor(
     "return document.body.textContent.includes('m6i.xlarge') && document.body.textContent.includes('312,44')",
+  );
+  await click("Presupuestos");
+  await waitFor("return document.querySelectorAll('.history').length === 2");
+  await execute(`
+    for (const [label,value] of [["Base: presupuesto guardado","saved-1"],["Objetivo: presupuesto guardado","saved-0"]]) {
+      const select=document.querySelector('select[aria-label="'+label+'"]');
+      select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+  `);
+  await waitFor(
+    "return document.querySelector('[data-testid=historical-comparison]')?.textContent.includes('Cambio de cobertura:') && document.querySelector('[data-testid=historical-comparison]')?.textContent.includes('Computación Azure')",
   );
   const screenshot = await request(
     `/session/${session}/screenshot`,

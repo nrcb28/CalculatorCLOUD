@@ -147,8 +147,20 @@ describe("importación y exportación", () => {
   });
   it("escapa CSV, fórmulas precedidas de espacios y saltos", () => {
     expect(csv([["=1+1", 'a"b']])).toContain('"\'=1+1","a""b"');
-    for (const v of ["  =1+1", "\t@SUM(A1)", "\rtest", "\n=1"])
+    for (const v of [
+      "  =1+1",
+      "\t@SUM(A1)",
+      "\rtest",
+      "\n=1",
+      "-1+2",
+      "-cmd",
+      "-1e3",
+      " -1",
+    ])
       expect(csv([[v]])).toContain("\"'" + v + '"');
+  });
+  it("conserva decimales negativos como cifras sin permitir expresiones", () => {
+    expect(csv([["-145.80", "-0.01"]])).toBe('\uFEFF"-145.80","-0.01"');
   });
 });
 describe("caducidad", () => {

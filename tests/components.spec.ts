@@ -8,11 +8,13 @@ const scenario = {
 };
 async function importScenario(page: Page, value: unknown) {
   await page.getByRole("button", { name: "Presupuestos", exact: true }).click();
-  await page.getByLabel("Importar presupuesto JSON").setInputFiles({
-    name: "components.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(JSON.stringify(value)),
-  });
+  await page
+    .getByLabel("Importar presupuesto JSON", { exact: true })
+    .setInputFiles({
+      name: "components.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(value)),
+    });
 }
 async function downloadedText(page: Page, button: string) {
   const promise = page.waitForEvent("download");

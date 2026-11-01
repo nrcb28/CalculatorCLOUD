@@ -15,7 +15,11 @@ Con tauri-driver 2.1.0, WebKitWebDriver, Xvfb y D-Bus, la prueba:
 5. Consulta el historial SQLite mediante IPC y reabre el escenario.
 6. El recorrido ampliado guarda también un escenario con disco y red, conserva
    ambos presupuestos y recupera 266,00 USD del escenario nuevo después de reiniciar.
-   Los importes son sintéticos exclusivos de prueba. Se guarda una captura.
+   Los importes Azure son sintéticos exclusivos de prueba. Se guarda una captura.
+7. Conserva una tarifa pública AWS capturada dentro del escenario ampliado y
+   comprueba su importe después de reiniciar, sin consultar AWS.
+8. Selecciona ambos presupuestos desde la biblioteca real y comprueba que la
+   comparación histórica detecta la distinta cobertura, conservando computación.
 
 No se reemplazan los comandos IPC. El directorio XDG temporal permanece entre
 las dos sesiones y se elimina al terminar; nunca se usa una base del usuario.

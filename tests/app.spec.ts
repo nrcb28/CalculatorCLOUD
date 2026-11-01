@@ -2,11 +2,13 @@ import { test, expect, type Page } from "@playwright/test";
 import { fixture } from "./fixtures";
 async function importFixture(page: Page, value: unknown = fixture) {
   await page.getByRole("button", { name: "Presupuestos", exact: true }).click();
-  await page.getByLabel("Importar presupuesto JSON").setInputFiles({
-    name: "scenario.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(JSON.stringify(value)),
-  });
+  await page
+    .getByLabel("Importar presupuesto JSON", { exact: true })
+    .setInputFiles({
+      name: "scenario.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(value)),
+    });
 }
 test("navegación, tema persistente y menú compacto", async ({ page }) => {
   await page.goto("/");

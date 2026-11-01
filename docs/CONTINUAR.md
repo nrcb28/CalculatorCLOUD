@@ -13,6 +13,13 @@ conector con clave efímera y pruebas de esquema, pero su consulta sin clave dio
 403: la verificación de precios en vivo sigue pendiente. Lee [MULTICLOUD.md](MULTICLOUD.md).
 El plan continúa por fases en [PLAN.md](PLAN.md); no marcar los pendientes como terminados.
 
+## Comparación histórica del 1 de noviembre de 2026
+
+La biblioteca permite comparar dos presupuestos guardados o importados sin
+consultar precios ni cambiar la calculadora. Conserva consumos, fuentes, fechas
+y avisos por distinta cobertura; exporta informe JSON/CSV. Lee [HISTORY.md](HISTORY.md).
+Quedan proyectos con varios recursos, consumo por periodos y PDF nativo.
+
 ## Punto de partida
 
 - Repositorio: https://github.com/nrcb28/CalculatorCLOUD, rama `main`.

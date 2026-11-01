@@ -24,7 +24,7 @@ npm run desktop
 3. Consulta tarifas oficiales. Selecciona expresamente un producto de la lista para calcular su computación Linux de pago por uso.
 4. Consulta proyecciones, guarda snapshots y exporta CSV/JSON. La impresión del sistema permite guardar PDF donde esté disponible; no hay generador PDF nativo.
 5. En Comparador consulta AWS o GCP con tipos y regiones explícitos. Las alternativas comparten instancias/horas y se incluyen en JSON/CSV/SQLite al guardar el escenario Azure. GCP requiere una clave API efímera.
-6. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo.
+6. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo. En «Comparación histórica» selecciona o importa dos presupuestos y exporta sus diferencias sin volver a consultar precios; véase [alcance y cálculo](docs/HISTORY.md).
 
 No hay datos ficticios en producción. Sin una tarifa real no se muestra un importe. Los únicos valores sintéticos están en pruebas. La tarifa no acredita equivalencia de rendimiento. Sin cotización adicional, el subtotal incluye solo computación. Con ella se suman capacidad Premium SSD LRS por un mes de referencia y salida MGN por tramos; consulta [condiciones y evidencia](docs/AZURE-COMPONENTS.md). No incluye bursting, snapshots, soporte, licencias adicionales, reservas, descuentos, impuestos ni otros servicios. No se declara ganador mientras falte cobertura multicloud.
 

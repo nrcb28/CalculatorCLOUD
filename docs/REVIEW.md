@@ -78,3 +78,14 @@ públicos de cada cotización. Las alternativas no se suman al subtotal Azure.
 JSON/CSV/SQLite conservan fuentes, fechas, recursos y cargos. Se prueban también
 respuestas tardías, borrado de clave y compatibilidad con snapshots anteriores.
 La prueba nativa Linux se amplía para recuperar una alternativa tras reiniciar.
+
+## Comparación histórica del 1 de noviembre de 2026
+
+La biblioteca compara dos copias con su consumo original sin nuevas consultas.
+Las diferencias se calculan antes de redondear y los porcentajes con base cero
+quedan sin definir. Si cambia la cobertura se omite la variación del subtotal
+y se conserva la comparación de computación. Las alternativas se mantienen
+separadas. Las importaciones no reemplazan la calculadora y un archivo inválido
+conserva la selección anterior. Se exportan fuentes y fechas en JSON/CSV.
+Se amplía el recorrido nativo para comparar dos presupuestos leídos de SQLite.
+Véase [HISTORY.md](HISTORY.md) para alcance y pendientes.

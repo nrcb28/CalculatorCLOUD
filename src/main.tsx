@@ -1,3 +1,4 @@
+import HistoryPanel from "./HistoryPanel";
 import MulticloudPanel from "./MulticloudPanel";
 import { type ComputeQuote } from "./comparison";
 import ComponentsPanel from "./ComponentsPanel";
@@ -1004,8 +1005,9 @@ function App() {
                 <div>
                   <h3>Comparar exige más que un precio por hora.</h3>
                   <p>
-                    Los conectores de AWS y GCP, la equivalencia técnica y los
-                    costes completos siguen pendientes.
+                    La equivalencia técnica y los costes completos de todos los
+                    proveedores siguen pendientes. GCP requiere una clave
+                    válida.
                   </p>
                 </div>
                 <button
@@ -1032,100 +1034,105 @@ function App() {
             </>
           )}
           {page === "Presupuestos" && (
-            <section>
-              <div className="section-title">
-                <div>
-                  <h3>Biblioteca de escenarios</h3>
-                  <p>
-                    Reabre un escenario y guárdalo de nuevo para duplicarlo.
-                  </p>
-                </div>
-                <label className="file-button">
-                  <Upload size={16} />
-                  Importar JSON
-                  <input
-                    type="file"
-                    accept=".json"
-                    aria-label="Importar presupuesto JSON"
-                    onChange={async (e) => {
-                      const input = e.currentTarget;
-                      try {
-                        const file = input.files?.[0];
-                        if (file) {
-                          if (file.size > 5000000)
-                            throw Error(
-                              "Archivo demasiado grande (máximo 5 MB)",
-                            );
-                          restore(parseSnapshot(JSON.parse(await file.text())));
-                        }
-                      } catch (e) {
-                        setMessage(errorMessage(e));
-                      } finally {
-                        input.value = "";
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-              {loadingHistory ? (
-                <div className="empty">
-                  <RefreshCw className="spin" />
-                  <p>Cargando presupuestos…</p>
-                </div>
-              ) : history.length ? (
-                history
-                  .filter((s) =>
-                    s.name
-                      .toLocaleLowerCase()
-                      .includes(search.toLocaleLowerCase()),
-                  )
-                  .map((s) => (
-                    <div className="history" key={s.id}>
-                      <div className="icon-tile purple">
-                        <FileText size={18} />
-                      </div>
-                      <div>
-                        <strong>{s.name}</strong>
-                        <small>
-                          {dateLabel(s.created)} · {s.config.region}
-                        </small>
-                      </div>
-                      <button onClick={() => restore(s)}>
-                        <Copy size={15} />
-                        Abrir escenario
-                      </button>
-                    </div>
-                  ))
-              ) : (
-                <div className="empty">
-                  <div className="empty-icon">
-                    <FolderOpen size={28} />
+            <>
+              <section>
+                <div className="section-title">
+                  <div>
+                    <h3>Biblioteca de escenarios</h3>
+                    <p>
+                      Reabre un escenario y guárdalo de nuevo para duplicarlo.
+                    </p>
                   </div>
-                  <h3>Tu próximo escenario empieza aquí</h3>
-                  <p>
-                    Guarda una estimación desde la calculadora o importa un
-                    presupuesto JSON.
-                  </p>
-                  <button
-                    className="secondary"
-                    onClick={() => navigate("Calculadora")}
-                  >
-                    <Plus size={16} />
-                    Crear escenario
-                  </button>
+                  <label className="file-button">
+                    <Upload size={16} />
+                    Importar JSON
+                    <input
+                      type="file"
+                      accept=".json"
+                      aria-label="Importar presupuesto JSON"
+                      onChange={async (e) => {
+                        const input = e.currentTarget;
+                        try {
+                          const file = input.files?.[0];
+                          if (file) {
+                            if (file.size > 5000000)
+                              throw Error(
+                                "Archivo demasiado grande (máximo 5 MB)",
+                              );
+                            restore(
+                              parseSnapshot(JSON.parse(await file.text())),
+                            );
+                          }
+                        } catch (e) {
+                          setMessage(errorMessage(e));
+                        } finally {
+                          input.value = "";
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
-              )}
-              {!!history.length && (
-                <label className="history-search">
-                  Buscar presupuesto
-                  <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Nombre del escenario"
-                  />
-                </label>
-              )}
-            </section>
+                {loadingHistory ? (
+                  <div className="empty">
+                    <RefreshCw className="spin" />
+                    <p>Cargando presupuestos…</p>
+                  </div>
+                ) : history.length ? (
+                  history
+                    .filter((s) =>
+                      s.name
+                        .toLocaleLowerCase()
+                        .includes(search.toLocaleLowerCase()),
+                    )
+                    .map((s) => (
+                      <div className="history" key={s.id}>
+                        <div className="icon-tile purple">
+                          <FileText size={18} />
+                        </div>
+                        <div>
+                          <strong>{s.name}</strong>
+                          <small>
+                            {dateLabel(s.created)} · {s.config.region}
+                          </small>
+                        </div>
+                        <button onClick={() => restore(s)}>
+                          <Copy size={15} />
+                          Abrir escenario
+                        </button>
+                      </div>
+                    ))
+                ) : (
+                  <div className="empty">
+                    <div className="empty-icon">
+                      <FolderOpen size={28} />
+                    </div>
+                    <h3>Tu próximo escenario empieza aquí</h3>
+                    <p>
+                      Guarda una estimación desde la calculadora o importa un
+                      presupuesto JSON.
+                    </p>
+                    <button
+                      className="secondary"
+                      onClick={() => navigate("Calculadora")}
+                    >
+                      <Plus size={16} />
+                      Crear escenario
+                    </button>
+                  </div>
+                )}
+                {!!history.length && (
+                  <label className="history-search">
+                    Buscar presupuesto
+                    <input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Nombre del escenario"
+                    />
+                  </label>
+                )}
+              </section>
+              <HistoryPanel history={history} />
+            </>
           )}
           {page === "Acceso a proveedores" && (
             <div className="provider-grid">

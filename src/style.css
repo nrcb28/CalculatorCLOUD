@@ -1303,3 +1303,28 @@ footer > span {
     height: 230px;
   }
 }
+.history-comparison p {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.history-comparison .file-button {
+  margin-top: 12px;
+}
+.history-comparison summary {
+  cursor: pointer;
+  font-size: 12px;
+  padding: 8px 0;
+}
+.history-comparison caption {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 14px 0;
+}
+.history-comparison tbody th {
+  text-transform: none;
+  letter-spacing: normal;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+}

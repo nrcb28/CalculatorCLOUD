@@ -14,7 +14,8 @@
 - [x] Cotización opcional de capacidad Premium SSD LRS y salida MGN por tramos, con uso previo, fuentes, snapshots/CSV/SQLite y evidencia en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
 - [ ] Fase 4: catálogo de especificaciones técnicas, equivalencias y precios completos de discos y red.
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
-- [ ] Proyectos con múltiples recursos, escenarios variables, comparación histórica y generador PDF nativo con fuentes y gráficos.
+- [x] Comparación histórica de dos presupuestos guardados/importados, con consumos originales, cambios de cobertura y exportación JSON/CSV; véase [HISTORY.md](HISTORY.md).
+- [ ] Proyectos con múltiples recursos, calendarios de consumo variable y generador PDF nativo con fuentes y gráficos.
 - [ ] EUR con fuente de cambio verificable, unidades GB/GiB normalizadas, tramos, descuentos y localización inglesa.
 - [ ] Fase 6: confirmar builds CI y pruebas manuales Windows/Linux; firma de instaladores y distribución pública.
 
