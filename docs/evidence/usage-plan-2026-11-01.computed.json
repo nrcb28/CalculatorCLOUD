@@ -1,0 +1,340 @@
+{
+  "months": [
+    {
+      "month": 1,
+      "instances": 1,
+      "hours": 0,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "99.98",
+          "exact": "99.98",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "0.00",
+          "exact": "0",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 2,
+      "instances": 1,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "267.88",
+          "exact": "267.88",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "156.22",
+          "exact": "156.22",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 3,
+      "instances": 1,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "267.88",
+          "exact": "267.88",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "156.22",
+          "exact": "156.22",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 4,
+      "instances": 1,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "267.88",
+          "exact": "267.88",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "156.22",
+          "exact": "156.22",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 5,
+      "instances": 1,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "267.88",
+          "exact": "267.88",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "156.22",
+          "exact": "156.22",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 6,
+      "instances": 1,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "267.88",
+          "exact": "267.88",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "156.22",
+          "exact": "156.22",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 7,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 8,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 9,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 10,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 11,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    },
+    {
+      "month": 12,
+      "instances": 2,
+      "hours": 730,
+      "costs": [
+        {
+          "provider": "Azure",
+          "instanceType": "Standard_D4s_v5",
+          "region": "westeurope",
+          "scope": "Computación + capacidad de discos + salida",
+          "monthly": "457.46",
+          "exact": "457.46",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:39:14.263712014+00:00; 2026-10-29T16:31:59.924034209+00:00"
+        },
+        {
+          "provider": "AWS",
+          "instanceType": "m6i.xlarge",
+          "region": "eu-west-1",
+          "scope": "Computación alternativa",
+          "monthly": "312.44",
+          "exact": "312.44",
+          "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+          "fetched": "2026-10-30T22:03:34.539764287+00:00"
+        }
+      ]
+    }
+  ],
+  "totals": [
+    {
+      "provider": "Azure",
+      "amount": "4184.14",
+      "exact": "4184.14"
+    },
+    {
+      "provider": "AWS",
+      "amount": "2655.74",
+      "exact": "2655.74"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!(
         "{}",
-        serde_json::json!({"ok":true,"snapshotsAfterReopen":1,"components":value.get("components").is_some(),"verifiedAt":chrono::Utc::now().to_rfc3339()})
+        serde_json::json!({"ok":true,"snapshotsAfterReopen":1,"components":value.get("components").is_some(),"usagePlanMonths":value["usagePlan"]["months"].as_array().map_or(0,Vec::len),"verifiedAt":chrono::Utc::now().to_rfc3339()})
     );
     Ok(())
 }

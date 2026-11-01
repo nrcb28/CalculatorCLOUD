@@ -18,7 +18,10 @@ El plan continúa por fases en [PLAN.md](PLAN.md); no marcar los pendientes como
 La biblioteca permite comparar dos presupuestos guardados o importados sin
 consultar precios ni cambiar la calculadora. Conserva consumos, fuentes, fechas
 y avisos por distinta cobertura; exporta informe JSON/CSV. Lee [HISTORY.md](HISTORY.md).
-Quedan proyectos con varios recursos, consumo por periodos y PDF nativo.
+El plan posterior de [doce meses de referencia](USAGE-PLAN.md) ya permite variar
+instancias/horas conservando tarifas y campos del mes base en JSON/CSV/SQLite.
+Quedan proyectos con varios recursos, calendario civil, disco/red variable por
+periodo, comparación entre planes y PDF nativo.
 
 ## Punto de partida
 

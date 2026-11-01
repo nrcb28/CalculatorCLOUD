@@ -147,5 +147,23 @@ export function historyRows(base: Snapshot, target: Snapshot): string[][] {
       "",
       "Solo se compara computación: un escenario incluye discos/red y el otro no",
     ]);
+  if (report.baseline.usagePlan || report.target.usagePlan)
+    rows.push([
+      "Aviso",
+      "",
+      "",
+      "",
+      "",
+      "Planes mensuales conservados",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Las variaciones comparan el mes base, no los totales de los planes mensuales",
+    ]);
   return rows;
 }

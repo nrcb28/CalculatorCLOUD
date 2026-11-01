@@ -1,0 +1,17 @@
+{
+  "model": "monthly-usage-v1",
+  "months": [
+    { "instances": 2, "hours": 0 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 },
+    { "instances": 2, "hours": 730 }
+  ]
+}

@@ -179,6 +179,13 @@ export default function HistoryPanel({ history }: { history: Snapshot[] }) {
             no demuestra ahorro ni un cambio de precio del proveedor; las
             configuraciones y fechas pueden ser distintas.
           </p>
+          {(report.baseline.usagePlan || report.target.usagePlan) && (
+            <p role="status">
+              Hay un plan mensual conservado. Las variaciones de esta tabla
+              comparan el mes base, no los totales de los planes. Sus doce meses
+              se incluyen en el CSV y JSON.
+            </p>
+          )}
           {report.coverageChanged && (
             <p role="status">
               <strong>Cambio de cobertura:</strong> un escenario incluye

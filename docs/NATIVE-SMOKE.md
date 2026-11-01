@@ -18,7 +18,9 @@ Con tauri-driver 2.1.0, WebKitWebDriver, Xvfb y D-Bus, la prueba:
    Los importes Azure son sintéticos exclusivos de prueba. Se guarda una captura.
 7. Conserva una tarifa pública AWS capturada dentro del escenario ampliado y
    comprueba su importe después de reiniciar, sin consultar AWS.
-8. Selecciona ambos presupuestos desde la biblioteca real y comprueba que la
+8. Recupera también un plan de doce meses con el primer periodo a cero horas,
+   comprueba 3.046,00 USD del plan Azure y mantiene el presupuesto antiguo válido.
+9. Selecciona ambos presupuestos desde la biblioteca real y comprueba que la
    comparación histórica detecta la distinta cobertura, conservando computación.
 
 No se reemplazan los comandos IPC. El directorio XDG temporal permanece entre

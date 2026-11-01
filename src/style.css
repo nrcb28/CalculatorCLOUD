@@ -1328,3 +1328,20 @@ footer > span {
   font-size: 11px;
   font-weight: 500;
 }
+.usage-plan p {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.usage-plan caption {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 14px 0;
+}
+.usage-plan input {
+  min-width: 95px;
+  margin-top: 0;
+}
+.usage-plan tfoot td {
+  font-weight: 600;
+}

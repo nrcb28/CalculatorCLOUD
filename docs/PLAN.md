@@ -15,7 +15,8 @@
 - [ ] Fase 4: catálogo de especificaciones técnicas, equivalencias y precios completos de discos y red.
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
 - [x] Comparación histórica de dos presupuestos guardados/importados, con consumos originales, cambios de cobertura y exportación JSON/CSV; véase [HISTORY.md](HISTORY.md).
-- [ ] Proyectos con múltiples recursos, calendarios de consumo variable y generador PDF nativo con fuentes y gráficos.
+- [x] Plan de doce meses de referencia con instancias/horas variables, tarifas conservadas, cálculo decimal y JSON/CSV/SQLite; véase [USAGE-PLAN.md](USAGE-PLAN.md).
+- [ ] Proyectos con múltiples recursos, calendario civil y disco/red variable por periodo, comparación entre planes y generador PDF nativo con fuentes y gráficos.
 - [ ] EUR con fuente de cambio verificable, unidades GB/GiB normalizadas, tramos, descuentos y localización inglesa.
 - [ ] Fase 6: confirmar builds CI y pruebas manuales Windows/Linux; firma de instaladores y distribución pública.
 

@@ -89,3 +89,13 @@ separadas. Las importaciones no reemplazan la calculadora y un archivo inválido
 conserva la selección anterior. Se exportan fuentes y fechas en JSON/CSV.
 Se amplía el recorrido nativo para comparar dos presupuestos leídos de SQLite.
 Véase [HISTORY.md](HISTORY.md) para alcance y pendientes.
+
+## Consumo por periodos
+
+El plan opcional conserva doce meses de instancias/horas, con las tarifas y
+condiciones del escenario. Los totales suman importes sin redondear y mantienen
+alternativas separadas. A cero horas se conservan disco/red cuando están cotizados.
+Se valida y normaliza en TypeScript y Rust, se comprueba reapertura SQLite y
+se amplía la prueba nativa. Los presupuestos antiguos siguen siendo válidos.
+Los gráficos y variaciones históricas continúan mostrando el mes base, con
+avisos explícitos cuando hay plan. Véase [USAGE-PLAN.md](USAGE-PLAN.md).

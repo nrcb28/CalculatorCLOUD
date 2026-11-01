@@ -313,3 +313,50 @@ fn explicit_refresh_bypasses_fresh_cache_but_retains_it_on_failure() {
         assert_eq!(failed.rates, vec![updated]);
     });
 }
+
+#[test]
+fn monthly_plan_is_normalized_and_survives_reopening_without_losing_legacy_budgets() {
+    let disk = DiskDb::new();
+    let old = budget("legacy");
+    save_budget(&disk.0, "legacy", &old.to_string()).unwrap();
+    let mut new = budget("planned");
+    let mut plan: Value =
+        serde_json::from_str(include_str!("../../../tests/usage-plan-fixture.json")).unwrap();
+    plan["secret"] = json!("test-secret");
+    plan["months"][0]["secret"] = json!("test-secret");
+    new["usagePlan"] = plan;
+    save_budget(&disk.0, "planned", &new.to_string()).unwrap();
+    let entries = list_budgets(&disk.0).unwrap();
+    assert_eq!(entries.len(), 2);
+    let stored: Value = entries
+        .iter()
+        .map(|s| serde_json::from_str::<Value>(s).unwrap())
+        .find(|v| v["id"] == "planned")
+        .unwrap();
+    assert_eq!(stored["usagePlan"]["months"][0]["hours"], 0);
+    assert_eq!(stored["usagePlan"]["months"].as_array().unwrap().len(), 12);
+    assert!(!stored.to_string().contains("test-secret"));
+    for (key, value) in [
+        ("instances", json!(0)),
+        ("instances", json!(1.5)),
+        ("instances", json!(100001)),
+        ("hours", json!(745)),
+        ("hours", json!(-1)),
+        ("hours", Value::Null),
+    ] {
+        let mut bad = new.clone();
+        bad["usagePlan"]["months"][0][key] = value;
+        assert!(save_budget(&disk.0, "planned", &bad.to_string()).is_err());
+    }
+    for invalid in [
+        Value::Null,
+        json!({}),
+        json!({"model":"other","months":[]}),
+        json!({"model":"monthly-usage-v1","months":[]}),
+    ] {
+        let mut bad = new.clone();
+        bad["usagePlan"] = invalid;
+        assert!(save_budget(&disk.0, "planned", &bad.to_string()).is_err());
+    }
+    assert_eq!(list_budgets(&disk.0).unwrap().len(), 2);
+}

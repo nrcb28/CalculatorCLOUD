@@ -1,3 +1,5 @@
+import UsagePlanPanel from "./UsagePlanPanel";
+import { parseUsagePlan, type UsagePlan } from "./usage-plan";
 import HistoryPanel from "./HistoryPanel";
 import MulticloudPanel from "./MulticloudPanel";
 import { type ComputeQuote } from "./comparison";
@@ -114,6 +116,7 @@ function App() {
     [rates, setRates] = useState<Rate[]>([]),
     [fetched, setFetched] = useState(""),
     [selected, setSelected] = useState("");
+  const [usagePlan, setUsagePlan] = useState<UsagePlan>();
   const [comparisonQuotes, setComparisonQuotes] = useState<ComputeQuote[]>([]);
   const [components, setComponents] = useState<Components>();
   const [quotingComponents, setQuotingComponents] = useState(false);
@@ -150,6 +153,12 @@ function App() {
   try {
     validate(config);
     if (components) computeComponents(config, components);
+  } catch (e) {
+    inputError = (e as Error).message;
+  }
+  const baseInputError = inputError;
+  try {
+    if (usagePlan) parseUsagePlan(usagePlan);
   } catch (e) {
     inputError = (e as Error).message;
   }
@@ -294,6 +303,7 @@ function App() {
       fetched,
       ...(components === undefined ? {} : { components }),
       ...(comparisonQuotes.length ? { comparisonQuotes } : {}),
+      ...(usagePlan ? { usagePlan } : {}),
     });
   }
   async function save() {
@@ -315,6 +325,7 @@ function App() {
     setBusy(false);
     setQuotingComponents(false);
     setComponents(s.components);
+    setUsagePlan(s.usagePlan);
     setComparisonQuotes(s.comparisonQuotes ?? []);
     setConfig(s.config);
     setRates(s.rates);
@@ -428,7 +439,9 @@ function App() {
         <small>12 meses con el mismo consumo</small>
         <div className="metric-note">
           <Clock3 size={12} />
-          Hipótesis de consumo constante
+          {usagePlan
+            ? "Consumo base constante · plan variable en Calculadora"
+            : "Hipótesis de consumo constante"}
         </div>
       </article>
       <article className="metric">
@@ -880,6 +893,16 @@ function App() {
                   </div>
                 </section>
               </div>
+              <UsagePlanPanel
+                config={config}
+                rate={rate}
+                fetched={fetched}
+                components={components}
+                quotes={comparisonQuotes}
+                plan={usagePlan}
+                onChange={setUsagePlan}
+                disabled={!!baseInputError}
+              />
               <ComponentsPanel
                 config={config}
                 components={components}

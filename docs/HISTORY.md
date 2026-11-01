@@ -44,8 +44,10 @@ JSON». Para volver a comparar, selecciona los presupuestos originales o importa
 las propiedades `baseline` y `target` como archivos de presupuesto separados.
 La validación de una importación no acredita su autenticidad contra el proveedor.
 
-Esta fase añade comparación histórica de dos presupuestos. Proyectos con varios
-recursos, calendarios de consumo variable y PDF nativo siguen pendientes.
+Esta fase añade comparación histórica de dos presupuestos. La fase posterior
+incorpora [planes mensuales](USAGE-PLAN.md); las variaciones históricas siguen
+comparando el mes base, con aviso visible si hay planes. Proyectos con varios
+recursos, comparación entre planes y PDF nativo siguen pendientes.
 
 ## Ejemplo reproducible y comprobaciones
 

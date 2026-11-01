@@ -1,5 +1,7 @@
+import { parseUsagePlan, type UsagePlan } from "./usage-plan.ts";
 import {
   parseQuotes,
+  quoteCost,
   comparisonRows,
   type ComputeQuote,
 } from "./comparison.ts";
@@ -46,6 +48,7 @@ export type Snapshot = {
   fetched: string;
   components?: Components;
   comparisonQuotes?: ComputeQuote[];
+  usagePlan?: UsagePlan;
 };
 const record = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
@@ -213,6 +216,9 @@ export function parseSnapshot(input: unknown): Snapshot {
     ...(input.comparisonQuotes === undefined
       ? {}
       : { comparisonQuotes: parseQuotes(input.comparisonQuotes) }),
+    ...(input.usagePlan === undefined
+      ? {}
+      : { usagePlan: parseUsagePlan(input.usagePlan) }),
     id: input.id,
     name: input.name,
     created: input.created,
@@ -361,5 +367,96 @@ export function snapshotRows(s: Snapshot): string[][] {
     rows.push(
       ...comparisonRows(checked.comparisonQuotes, c.instances, c.hours),
     );
+  if (checked.usagePlan) {
+    const result = computePlan(checked);
+    for (const month of result.months)
+      for (const cost of month.costs) {
+        rows.push([
+          `Plan mes ${month.month}: ${cost.scope}`,
+          cost.provider,
+          cost.instanceType,
+          cost.region,
+          cost.monthly,
+          "",
+          cost.source,
+          cost.fetched,
+          "ver tarifas conservadas",
+          `${month.instances} instancias × ${month.hours} horas; precios constantes; disco por mes completo; salida y uso previo del mes base repetidos; alternativas separadas`,
+        ]);
+      }
+    for (const total of result.totals) {
+      const metadata = result.months[0].costs.find(
+        (c) => c.provider === total.provider,
+      )!;
+      rows.push([
+        "Total plan de doce meses",
+        total.provider,
+        "ver meses",
+        "",
+        "",
+        total.amount,
+        metadata.source,
+        metadata.fetched,
+        "ver tarifas conservadas",
+        "Suma decimal antes de redondear; no es doce veces el mes base; sin previsión de cambios de precio",
+      ]);
+    }
+  }
   return rows;
+}
+
+/** Doce meses de referencia independientes; las alternativas nunca se suman a Azure. */
+export function computePlan(raw: Snapshot) {
+  const s = parseSnapshot(raw);
+  if (!s.usagePlan) throw Error("No hay plan mensual");
+  const months = s.usagePlan.months.map((usage, i) => {
+    const c = { ...s.config, ...usage },
+      vm = compute(c, s.rates[0]);
+    const azure = s.components
+      ? computeComponents(c, s.components, vm.monthlyExact)
+      : vm;
+    const costs = [
+      {
+        provider: "Azure",
+        instanceType: c.sku,
+        region: c.region,
+        scope: s.components
+          ? "Computación + capacidad de discos + salida"
+          : "Computación",
+        monthly: azure.monthly,
+        exact: azure.monthlyExact,
+        source: AZURE_SOURCE,
+        fetched: [
+          s.fetched,
+          ...(s.components ? [s.components.fetched] : []),
+        ].join("; "),
+      },
+    ];
+    for (const q of s.comparisonQuotes ?? []) {
+      const amount = quoteCost(q, c.instances, c.hours);
+      costs.push({
+        provider: q.provider,
+        instanceType: q.instanceType,
+        region: q.region,
+        scope: "Computación alternativa",
+        monthly: amount.monthly,
+        exact: amount.monthlyExact,
+        source: q.source,
+        fetched: q.fetched,
+      });
+    }
+    return { month: i + 1, ...usage, costs };
+  });
+  const totals = months[0].costs.map((cost, index) => {
+    const sum = months.reduce(
+      (sum, m) => sum.add(m.costs[index].exact),
+      new Decimal(0),
+    );
+    return {
+      provider: cost.provider,
+      amount: sum.toFixed(2),
+      exact: sum.toString(),
+    };
+  });
+  return { months, totals };
 }

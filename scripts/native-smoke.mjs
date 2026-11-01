@@ -117,6 +117,12 @@ try {
         ...fixture,
         config: { ...fixture.config, egress: 1000, egressUsedGB: 100 },
         components,
+        usagePlan: JSON.parse(
+          readFileSync(
+            new URL("../tests/usage-plan-fixture.json", import.meta.url),
+            "utf8",
+          ),
+        ),
         comparisonQuotes: [
           JSON.parse(
             readFileSync(
@@ -143,6 +149,9 @@ try {
   await click("Abrir escenario");
   await waitFor(
     "return document.querySelector('[data-testid=components-total]')?.textContent.includes('266,00')",
+  );
+  await waitFor(
+    "return document.querySelector('[data-testid=plan-total-Azure]')?.textContent.includes('3046,00')",
   );
   await click("Comparador");
   await waitFor(

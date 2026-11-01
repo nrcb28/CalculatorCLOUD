@@ -114,6 +114,9 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
     if let Some(quotes) = v.get("comparisonQuotes") {
         normalize_quotes(quotes)?;
     }
+    if let Some(plan) = v.get("usagePlan") {
+        normalize_plan(plan)?;
+    }
     Ok(())
 }
 fn normalize_quotes(value: &Value) -> Result<Value, String> {
@@ -131,6 +134,27 @@ fn normalize_quotes(value: &Value) -> Result<Value, String> {
         clean.push(q);
     }
     Ok(Value::Array(clean))
+}
+fn normalize_plan(value: &Value) -> Result<Value, String> {
+    if value["model"] != "monthly-usage-v1" {
+        return Err("Plan mensual no válido".into());
+    }
+    let months = value["months"]
+        .as_array()
+        .filter(|m| m.len() == 12)
+        .ok_or("El plan requiere doce meses")?;
+    let mut clean = Vec::new();
+    for m in months {
+        if !number(&m["instances"], 100000.)
+            || m["instances"].as_f64().unwrap_or(0.) < 1.
+            || m["instances"].as_f64().unwrap_or(0.).fract() != 0.
+            || !number(&m["hours"], 744.)
+        {
+            return Err("Consumos del plan no válidos".into());
+        }
+        clean.push(serde_json::json!({"instances":m["instances"],"hours":m["hours"]}));
+    }
+    Ok(serde_json::json!({"model":"monthly-usage-v1","months":clean}))
 }
 // Persistir solo el esquema permitido, también cuando el comando se invoca sin el frontend.
 pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
@@ -184,6 +208,9 @@ pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
     }
     if let Some(quotes) = input.get("comparisonQuotes") {
         output["comparisonQuotes"] = normalize_quotes(quotes)?;
+    }
+    if let Some(plan) = input.get("usagePlan") {
+        output["usagePlan"] = normalize_plan(plan)?;
     }
     serde_json::to_string(&output).map_err(|_| "No se pudo serializar el presupuesto".into())
 }
