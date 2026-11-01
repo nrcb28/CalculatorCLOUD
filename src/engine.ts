@@ -1,3 +1,8 @@
+import {
+  parseQuotes,
+  comparisonRows,
+  type ComputeQuote,
+} from "./comparison.ts";
 import { date } from "./dates.ts";
 import {
   parseComponents,
@@ -40,6 +45,7 @@ export type Snapshot = {
   rates: Rate[];
   fetched: string;
   components?: Components;
+  comparisonQuotes?: ComputeQuote[];
 };
 const record = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
@@ -204,6 +210,9 @@ export function parseSnapshot(input: unknown): Snapshot {
     throw Error("Tarifa inválida o incompatible con el presupuesto");
   const rate = rates[0] as Rate;
   return {
+    ...(input.comparisonQuotes === undefined
+      ? {}
+      : { comparisonQuotes: parseQuotes(input.comparisonQuotes) }),
     id: input.id,
     name: input.name,
     created: input.created,
@@ -345,5 +354,9 @@ export function snapshotRows(s: Snapshot): string[][] {
       ],
     );
   }
+  if (checked.comparisonQuotes)
+    rows.push(
+      ...comparisonRows(checked.comparisonQuotes, c.instances, c.hours),
+    );
   return rows;
 }

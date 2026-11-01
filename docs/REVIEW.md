@@ -33,7 +33,7 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 
 ## Pendientes y límites
 
-Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. Siguen pendientes AWS/GCP de estimación, equivalencia técnica de instancias, almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de los instaladores. Los presupuestos de esta versión contienen una única tarifa de computación.
+Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. La fase multicloud posterior incorpora alternativas EC2 y N2; véase [MULTICLOUD.md](MULTICLOUD.md). Siguen pendientes GCP en vivo, equivalencia técnica, cobertura completa de almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de instaladores.
 
 ## Revisión por fases del 29 de octubre de 2026
 
@@ -68,3 +68,13 @@ La fase adicional y su evidencia están en [AZURE-COMPONENTS.md](AZURE-COMPONENT
 Se conservan las tarifas, condiciones y uso previo en JSON/SQLite/CSV. Los
 formatos antiguos siguen siendo válidos. El resumen cotizado incluye componentes;
 los gráficos y comparación identifican su alcance de computación.
+
+## Comparación de computación multicloud
+
+EC2 procesa el CSV regional completo con memoria acotada y rechaza ambigüedades,
+respuestas incompletas y registros excesivos. N2 compone CPU y RAM con Money decimal
+y rechaza unidades, tramos o monedas incompatibles. Solo se conservan campos
+públicos de cada cotización. Las alternativas no se suman al subtotal Azure.
+JSON/CSV/SQLite conservan fuentes, fechas, recursos y cargos. Se prueban también
+respuestas tardías, borrado de clave y compatibilidad con snapshots anteriores.
+La prueba nativa Linux se amplía para recuperar una alternativa tras reiniciar.

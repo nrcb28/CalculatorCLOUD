@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use cloudcost_core::{
     http::{self, ConnectionError},
+    multicloud,
     provider::{bounded_json, fetch_components, AZURE},
     storage,
 };
@@ -34,6 +35,21 @@ async fn azure_prices(
 #[tauri::command]
 async fn azure_components(region: String) -> Result<serde_json::Value, ConnectionError> {
     fetch_components(&region).await
+}
+#[tauri::command]
+async fn compute_quote(
+    provider: String,
+    instance_type: String,
+    region: String,
+    api_key: Option<String>,
+) -> Result<serde_json::Value, ConnectionError> {
+    match provider.as_str() {
+        "AWS" => multicloud::fetch_aws(&instance_type, &region).await,
+        "GCP" => {
+            multicloud::fetch_gcp(&instance_type, &region, api_key.as_deref().unwrap_or("")).await
+        }
+        _ => Err("Proveedor de comparación desconocido".into()),
+    }
 }
 #[derive(Serialize)]
 struct ConnectionStatus {
@@ -96,6 +112,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             azure_prices,
             azure_components,
+            compute_quote,
             check_provider,
             save_budget,
             list_budgets

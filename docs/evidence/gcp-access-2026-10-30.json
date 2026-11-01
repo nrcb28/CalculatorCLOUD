@@ -1,0 +1,7 @@
+{
+  "source": "https://cloudbilling.googleapis.com/v1/services/6F81-5844-456A/skus",
+  "httpStatus": 403,
+  "status": "PERMISSION_DENIED",
+  "credentialsProvided": false,
+  "pricesVerified": false
+}

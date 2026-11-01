@@ -117,6 +117,14 @@ try {
         ...fixture,
         config: { ...fixture.config, egress: 1000, egressUsedGB: 100 },
         components,
+        comparisonQuotes: [
+          JSON.parse(
+            readFileSync(
+              new URL("../tests/aws-quote-fixture.json", import.meta.url),
+              "utf8",
+            ),
+          ),
+        ],
       },
     ],
   );
@@ -135,6 +143,10 @@ try {
   await click("Abrir escenario");
   await waitFor(
     "return document.querySelector('[data-testid=components-total]')?.textContent.includes('266,00')",
+  );
+  await click("Comparador");
+  await waitFor(
+    "return document.body.textContent.includes('m6i.xlarge') && document.body.textContent.includes('312,44')",
   );
   const screenshot = await request(
     `/session/${session}/screenshot`,

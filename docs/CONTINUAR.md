@@ -6,6 +6,13 @@
 > [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md). La persistencia SQLite se verificó después en
 > [SQLITE-LIVE.md](SQLITE-LIVE.md). La guía siguiente conserva el contexto de la tarea original.
 
+## Fase multicloud del 30 de octubre de 2026
+
+EC2 Bulk público ya tiene conector de estimación y evidencia real. GCP N2 tiene
+conector con clave efímera y pruebas de esquema, pero su consulta sin clave dio
+403: la verificación de precios en vivo sigue pendiente. Lee [MULTICLOUD.md](MULTICLOUD.md).
+El plan continúa por fases en [PLAN.md](PLAN.md); no marcar los pendientes como terminados.
+
 ## Punto de partida
 
 - Repositorio: https://github.com/nrcb28/CalculatorCLOUD, rama `main`.
@@ -13,7 +20,7 @@
 - Escritorio Tauri 2 + React/TypeScript + Rust, interfaz en español y SQLite.
 - Motor, snapshots, importación/exportación y conector Azure inicial implementados.
 - Verificación local anterior: 56 pruebas TypeScript, 14 Rust y 11 Chromium aprobadas; npm audit sin vulnerabilidades. La CI generó instaladores Windows y Linux.
-- AWS/GCP tienen pruebas de acceso al catálogo, pero no conectores de estimación. No presentar el proyecto como un comparador multicloud terminado.
+- Estado inicial anterior a la fase multicloud: AWS/GCP solo tenían pruebas de acceso al catálogo. No presentar el proyecto como un comparador multicloud terminado.
 
 ## Bloqueo que motivó la nueva tarea
 

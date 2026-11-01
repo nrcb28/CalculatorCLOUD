@@ -111,7 +111,26 @@ pub fn validate_budget(id: &str, data: &str) -> Result<(), String> {
     if let Some(components) = v.get("components") {
         crate::components::normalize(components, c)?;
     }
+    if let Some(quotes) = v.get("comparisonQuotes") {
+        normalize_quotes(quotes)?;
+    }
     Ok(())
+}
+fn normalize_quotes(value: &Value) -> Result<Value, String> {
+    let rows = value
+        .as_array()
+        .filter(|r| r.len() <= 2)
+        .ok_or("Comparación no válida")?;
+    let mut seen = std::collections::HashSet::new();
+    let mut clean = Vec::new();
+    for row in rows {
+        let q = crate::multicloud::normalize_quote(row)?;
+        if !seen.insert(q["provider"].as_str().unwrap().to_string()) {
+            return Err("Proveedor repetido en la comparación".into());
+        }
+        clean.push(q);
+    }
+    Ok(Value::Array(clean))
 }
 // Persistir solo el esquema permitido, también cuando el comando se invoca sin el frontend.
 pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
@@ -162,6 +181,9 @@ pub fn normalize_budget(id: &str, data: &str) -> Result<String, String> {
             output["config"]["egressUsedGB"] = serde_json::json!(0);
         }
         output["components"] = crate::components::normalize(components, &input["config"])?;
+    }
+    if let Some(quotes) = input.get("comparisonQuotes") {
+        output["comparisonQuotes"] = normalize_quotes(quotes)?;
     }
     serde_json::to_string(&output).map_err(|_| "No se pudo serializar el presupuesto".into())
 }

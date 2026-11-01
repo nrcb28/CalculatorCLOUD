@@ -1,3 +1,5 @@
+import MulticloudPanel from "./MulticloudPanel";
+import { type ComputeQuote } from "./comparison";
 import ComponentsPanel from "./ComponentsPanel";
 import {
   selectComponents,
@@ -111,6 +113,7 @@ function App() {
     [rates, setRates] = useState<Rate[]>([]),
     [fetched, setFetched] = useState(""),
     [selected, setSelected] = useState("");
+  const [comparisonQuotes, setComparisonQuotes] = useState<ComputeQuote[]>([]);
   const [components, setComponents] = useState<Components>();
   const [quotingComponents, setQuotingComponents] = useState(false);
   const [message, setMessage] = useState(""),
@@ -289,6 +292,7 @@ function App() {
       rates: [rate],
       fetched,
       ...(components === undefined ? {} : { components }),
+      ...(comparisonQuotes.length ? { comparisonQuotes } : {}),
     });
   }
   async function save() {
@@ -310,13 +314,14 @@ function App() {
     setBusy(false);
     setQuotingComponents(false);
     setComponents(s.components);
+    setComparisonQuotes(s.comparisonQuotes ?? []);
     setConfig(s.config);
     setRates(s.rates);
     setFetched(s.fetched);
     setSelected(rateKey(s.rates[0]));
     setNow(Date.now());
     setMessage(
-      "Escenario abierto con su tarifa histórica. Una importación JSON no verifica su autenticidad contra Azure.",
+      "Escenario abierto con su tarifa histórica. Una importación JSON no verifica su autenticidad contra los proveedores.",
     );
     setPage("Calculadora");
   }
@@ -450,94 +455,14 @@ function App() {
     </div>
   );
   const comparison = (
-    <section className="comparison">
-      <div className="section-title">
-        <div>
-          <h3>Comparación de proveedores</h3>
-          <p>El mismo escenario, con el alcance de cada fuente a la vista.</p>
-        </div>
-        <span className="badge">
-          <span className="dot amber-dot" />
-          Cobertura incompleta
-        </span>
-      </div>
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Proveedor / servicio</th>
-              <th>Región efectiva</th>
-              <th>Computación / mes</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div className="provider-name">
-                  <span className="provider-logo azure">A</span>
-                  <div>
-                    Microsoft Azure<small>{config.sku}</small>
-                  </div>
-                </div>
-              </td>
-              <td>
-                {config.region}
-                <small>SKU explícito · Linux</small>
-              </td>
-              <td className="price-cell">
-                {cost ? money(cost.monthly) : "—"}
-                <small>
-                  {cost ? "USD · subtotal" : "Sin tarifa seleccionada"}
-                </small>
-              </td>
-              <td>
-                <span className="badge">
-                  {cost ? "Parcial" : "Pendiente de consulta"}
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div className="provider-name">
-                  <span className="provider-logo aws">a</span>
-                  <div>
-                    Amazon Web Services<small>Amazon EC2</small>
-                  </div>
-                </div>
-              </td>
-              <td>—</td>
-              <td className="price-cell">—</td>
-              <td>
-                <span className="badge muted-badge">Conector pendiente</span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div className="provider-name">
-                  <span className="provider-logo gcp">G</span>
-                  <div>
-                    Google Cloud<small>Compute Engine</small>
-                  </div>
-                </div>
-              </td>
-              <td>—</td>
-              <td className="price-cell">—</td>
-              <td>
-                <span className="badge muted-badge">Conector pendiente</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div className="table-note">
-        <Info size={15} />
-        <span>
-          Igualar vCPU y RAM no garantiza igual rendimiento. Faltan precios de
-          otros proveedores y servicios: no se puede determinar un ganador.
-        </span>
-      </div>
-    </section>
+    <MulticloudPanel
+      quotes={comparisonQuotes}
+      onChange={setComparisonQuotes}
+      instances={config.instances}
+      hours={config.hours}
+      azure={`${config.sku} · ${config.region} · ${cost ? money(cost.monthly) + " USD/mes" : "sin tarifa seleccionada"}`}
+      page={page}
+    />
   );
   return (
     <div

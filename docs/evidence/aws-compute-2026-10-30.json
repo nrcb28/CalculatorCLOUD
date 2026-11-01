@@ -1,0 +1,22 @@
+{
+  "catalogVersion": "20261029175634",
+  "charges": [
+    {
+      "description": "$0.214 per On Demand Linux m6i.xlarge Instance Hour",
+      "effective": "2026-10-01",
+      "id": "AYYS5AHM8RP6N3F4.JRTCKXETXF.6YS6EN2CT7",
+      "quantity": 1,
+      "unit": "instance-hour",
+      "unitPriceUSD": "0.2140000000"
+    }
+  ],
+  "fetched": "2026-10-30T22:03:34.539764287+00:00",
+  "instanceType": "m6i.xlarge",
+  "memoryGiB": 16.0,
+  "model": "compute-retail-v1",
+  "provider": "AWS",
+  "published": "2026-10-29T17:56:34Z",
+  "region": "eu-west-1",
+  "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+  "vcpu": 4
+}

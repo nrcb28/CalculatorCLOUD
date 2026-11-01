@@ -23,7 +23,8 @@ npm run desktop
 2. Configura instancias, horas, GiB de disco por instancia y GB de salida. Para incluir capacidad Premium SSD LRS y salida MGN, introduce el tráfico previo de la cuenta y pulsa «Cotizar discos y red».
 3. Consulta tarifas oficiales. Selecciona expresamente un producto de la lista para calcular su computación Linux de pago por uso.
 4. Consulta proyecciones, guarda snapshots y exporta CSV/JSON. La impresión del sistema permite guardar PDF donde esté disponible; no hay generador PDF nativo.
-5. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo.
+5. En Comparador consulta AWS o GCP con tipos y regiones explícitos. Las alternativas comparten instancias/horas y se incluyen en JSON/CSV/SQLite al guardar el escenario Azure. GCP requiere una clave API efímera.
+6. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo.
 
 No hay datos ficticios en producción. Sin una tarifa real no se muestra un importe. Los únicos valores sintéticos están en pruebas. La tarifa no acredita equivalencia de rendimiento. Sin cotización adicional, el subtotal incluye solo computación. Con ella se suman capacidad Premium SSD LRS por un mes de referencia y salida MGN por tramos; consulta [condiciones y evidencia](docs/AZURE-COMPONENTS.md). No incluye bursting, snapshots, soporte, licencias adicionales, reservas, descuentos, impuestos ni otros servicios. No se declara ganador mientras falte cobertura multicloud.
 
@@ -44,7 +45,7 @@ La revisión de interfaz y estabilidad incorpora pruebas unitarias TypeScript, p
 
 La ejecución inicial de Actions [40657232835](https://github.com/nrcb28/CalculatorCLOUD/actions/runs/40657232835) terminó correctamente con pruebas y paquetes NSIS, .deb y AppImage. Eso acredita la compilación de la versión inicial; cada revisión posterior debe pasar su propia ejecución.
 
-El 29 de octubre de 2026 se verificó **el conector Azure contra el servicio real** para `Standard_D4s_v5` en `westeurope`: 0,23 USD/h y 167,90 USD por 730 horas para una instancia Linux de pago por uso. Solo incluye computación. Consulta la [evidencia reproducible](docs/AZURE-LIVE.md). AWS y GCP no tienen todavía conectores de estimación. El panel de acceso comprueba los endpoints públicos de Azure y AWS y permite una prueba de GCP mediante API key efímera: no se guarda en disco. Las pruebas de navegador sustituyen IPC por dobles de prueba en determinados casos; no acreditan conexión real con los proveedores.
+El 29 de octubre de 2026 se verificó **el conector Azure contra el servicio real** para `Standard_D4s_v5` en `westeurope`: 0,23 USD/h y 167,90 USD por 730 horas para una instancia Linux de pago por uso. Solo incluye computación. Consulta la [evidencia reproducible](docs/AZURE-LIVE.md). El comparador incorpora EC2 Bulk público (verificado en vivo) y GCP N2 mediante Cloud Billing (pendiente de verificación con clave válida). Consulta [alcance, uso y evidencia multicloud](docs/MULTICLOUD.md). El panel de acceso comprueba los endpoints públicos de Azure y AWS y permite una prueba de GCP mediante API key efímera: no se guarda en disco. Las pruebas de navegador sustituyen IPC por dobles de prueba en determinados casos; no acreditan conexión real con los proveedores.
 
 Para ejecutar todas las comprobaciones:
 

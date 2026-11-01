@@ -8,7 +8,9 @@
 - [x] Integración HTTP local: paginación, ciclos, límite de páginas, 429, errores permanentes, redirecciones y cuerpos inválidos o sobredimensionados.
 - [x] Verificar WebView/IPC/SQLite con prueba nativa automatizada en Linux; véase [NATIVE-SMOKE.md](NATIVE-SMOKE.md).
 - [ ] Pruebas manuales de instaladores Windows/Linux.
-- [ ] Integrar catálogos AWS Bulk / Query y GCP Billing; custodia mediante almacén de credenciales del SO cuando se incorporen secretos.
+- [x] EC2 Bulk CSV público en streaming, selección explícita de tipos/regiones, computación USD y evidencia real; véase [MULTICLOUD.md](MULTICLOUD.md).
+- [x] Implementar GCP N2 (CPU + RAM) con Cloud Billing paginado y clave efímera, sin persistir credenciales.
+- [ ] Verificar precios GCP en vivo con clave válida; ampliar cobertura de catálogos y equivalencias. Almacén de credenciales del SO si se añade custodia persistente.
 - [x] Cotización opcional de capacidad Premium SSD LRS y salida MGN por tramos, con uso previo, fuentes, snapshots/CSV/SQLite y evidencia en [AZURE-COMPONENTS.md](AZURE-COMPONENTS.md).
 - [ ] Fase 4: catálogo de especificaciones técnicas, equivalencias y precios completos de discos y red.
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
