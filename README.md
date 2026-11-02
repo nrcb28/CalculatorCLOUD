@@ -23,9 +23,10 @@ npm run desktop
 2. Configura instancias, horas, GiB de disco por instancia y GB de salida. Para incluir capacidad Premium SSD LRS y salida MGN, introduce el tráfico previo de la cuenta y pulsa «Cotizar discos y red».
 3. Consulta tarifas oficiales. Selecciona expresamente un producto de la lista para calcular su computación Linux de pago por uso.
 4. En Calculadora puedes crear un [plan de doce meses](docs/USAGE-PLAN.md) y variar instancias/horas con las tarifas conservadas. El plan tiene su propio total; los gráficos y el resumen mantienen el mes base.
-5. Consulta proyecciones, guarda snapshots y exporta CSV/JSON. La impresión del sistema permite guardar PDF donde esté disponible; no hay generador PDF nativo.
+5. Consulta proyecciones, guarda snapshots y exporta CSV/JSON. En Proyectos agrupa recursos, elige el proveedor de cada uno y genera un [PDF nativo con fuentes y gráficos](docs/PROJECTS-PDF.md), con diálogo de guardado. La impresión del sistema sigue disponible.
 6. En Comparador consulta AWS o GCP con tipos y regiones explícitos. Las alternativas comparten instancias/horas y se incluyen en JSON/CSV/SQLite al guardar el escenario Azure. GCP requiere una clave API efímera.
-7. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo. En «Comparación histórica» selecciona o importa dos presupuestos y exporta sus diferencias sin volver a consultar precios; véase [alcance y cálculo](docs/HISTORY.md).
+7. Proyectos conserva varios recursos en SQLite y exporta JSON/CSV/PDF; cada recurso puede aplicar su plan mensual.
+8. Presupuestos permite importar JSON, abrir escenarios y duplicarlos al guardar de nuevo. En «Comparación histórica» selecciona o importa dos presupuestos y exporta sus diferencias sin volver a consultar precios; véase [alcance y cálculo](docs/HISTORY.md).
 
 No hay datos ficticios en producción. Sin una tarifa real no se muestra un importe. Los únicos valores sintéticos están en pruebas. La tarifa no acredita equivalencia de rendimiento. Sin cotización adicional, el subtotal incluye solo computación. Con ella se suman capacidad Premium SSD LRS por un mes de referencia y salida MGN por tramos; consulta [condiciones y evidencia](docs/AZURE-COMPONENTS.md). No incluye bursting, snapshots, soporte, licencias adicionales, reservas, descuentos, impuestos ni otros servicios. No se declara ganador mientras falte cobertura multicloud.
 

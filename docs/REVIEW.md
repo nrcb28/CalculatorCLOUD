@@ -33,7 +33,7 @@ Dashboard de resumen, calculadora y comparador con pantallas diferenciadas; icon
 
 ## Pendientes y límites
 
-Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. La fase multicloud posterior incorpora alternativas EC2 y N2; véase [MULTICLOUD.md](MULTICLOUD.md). Siguen pendientes GCP en vivo, equivalencia técnica, cobertura completa de almacenamiento/red, divisas, PDF nativo, firma y pruebas manuales de instaladores.
+Azure se verificó en vivo el 29 de octubre de 2026; véase [AZURE-LIVE.md](AZURE-LIVE.md). La persistencia real de caché y snapshots se verificó en [SQLITE-LIVE.md](SQLITE-LIVE.md). Las pruebas de navegador con IPC simulado se limitan a verificar el comportamiento de la interfaz. Las importaciones JSON son datos aportados por el usuario: no prueban la autenticidad de una tarifa, aunque la estructura sea correcta. La fase multicloud posterior incorpora alternativas EC2 y N2; véase [MULTICLOUD.md](MULTICLOUD.md). Siguen pendientes GCP en vivo, equivalencia técnica, cobertura completa de almacenamiento/red, divisas, firma y pruebas manuales de instaladores.
 
 ## Revisión por fases del 29 de octubre de 2026
 
@@ -99,3 +99,15 @@ Se valida y normaliza en TypeScript y Rust, se comprueba reapertura SQLite y
 se amplía la prueba nativa. Los presupuestos antiguos siguen siendo válidos.
 Los gráficos y variaciones históricas continúan mostrando el mes base, con
 avisos explícitos cuando hay plan. Véase [USAGE-PLAN.md](USAGE-PLAN.md).
+
+## Proyectos e informes PDF
+
+Proyectos separados de los presupuestos individuales, con copia por recurso y
+proveedor elegido. Se suma una única tarifa primaria y cada plan se aplica al
+recurso correspondiente. Se rechaza repetir salida Azure en varios recursos.
+Guardar valida antes de actualizar SQLite y conserva copias válidas ante errores.
+El PDF se calcula y genera en Rust con decimales, gráficos vectoriales y Open Sans
+incluida; se contrastan totales con la interfaz antes del diálogo de guardado.
+JSON/CSV/PDF conservan fuentes y condiciones. Se verifica la reapertura real y
+un PDF legible de tres páginas. La CI amplía WebView/IPC con proyectos y PDF.
+Consulta [PROJECTS-PDF.md](PROJECTS-PDF.md) para reproducción y límites.

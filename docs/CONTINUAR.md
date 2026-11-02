@@ -20,8 +20,10 @@ consultar precios ni cambiar la calculadora. Conserva consumos, fuentes, fechas
 y avisos por distinta cobertura; exporta informe JSON/CSV. Lee [HISTORY.md](HISTORY.md).
 El plan posterior de [doce meses de referencia](USAGE-PLAN.md) ya permite variar
 instancias/horas conservando tarifas y campos del mes base en JSON/CSV/SQLite.
-Quedan proyectos con varios recursos, calendario civil, disco/red variable por
-periodo, comparación entre planes y PDF nativo.
+La fase posterior de [proyectos y PDF](PROJECTS-PDF.md) agrega hasta 40 recursos,
+proveedor elegido por recurso, planes propios, SQLite/JSON/CSV y PDF generado en
+Rust con fuentes, gráficos y diálogo nativo. Quedan calendario civil, disco/red
+variable, modelo de cuentas/rutas y comparación entre planes/proyectos.
 
 ## Punto de partida
 

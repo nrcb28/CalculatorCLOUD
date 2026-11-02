@@ -16,7 +16,9 @@
 - [x] Fase 5 inicial: proyección de computación, snapshots JSON/SQLite, importación y CSV; impresión del sistema.
 - [x] Comparación histórica de dos presupuestos guardados/importados, con consumos originales, cambios de cobertura y exportación JSON/CSV; véase [HISTORY.md](HISTORY.md).
 - [x] Plan de doce meses de referencia con instancias/horas variables, tarifas conservadas, cálculo decimal y JSON/CSV/SQLite; véase [USAGE-PLAN.md](USAGE-PLAN.md).
-- [ ] Proyectos con múltiples recursos, calendario civil y disco/red variable por periodo, comparación entre planes y generador PDF nativo con fuentes y gráficos.
+- [x] Proyectos de hasta 40 recursos con proveedor elegido por recurso, planes propios y JSON/CSV/SQLite; véase [PROJECTS-PDF.md](PROJECTS-PDF.md).
+- [x] PDF nativo de proyectos generado en Rust con fuentes, condiciones, gráficos y tipografía incluida, más diálogo de guardado.
+- [ ] Calendario civil, disco/red variable por periodo, modelo de cuentas/rutas de red y comparación entre planes/proyectos.
 - [ ] EUR con fuente de cambio verificable, unidades GB/GiB normalizadas, tramos, descuentos y localización inglesa.
 - [ ] Fase 6: confirmar builds CI y pruebas manuales Windows/Linux; firma de instaladores y distribución pública.
 

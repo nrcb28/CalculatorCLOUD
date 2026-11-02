@@ -168,6 +168,43 @@ try {
   await waitFor(
     "return document.querySelector('[data-testid=historical-comparison]')?.textContent.includes('Cambio de cobertura:') && document.querySelector('[data-testid=historical-comparison]')?.textContent.includes('Computación Azure')",
   );
+  await click("Proyectos");
+  await click("Añadir escenario de la calculadora");
+  await click("Añadir escenario de la calculadora");
+  await execute(`
+    const select=document.querySelector('select[aria-label="Proveedor del recurso 2"]');
+    select.value="AWS";select.dispatchEvent(new Event('change',{bubbles:true}));
+  `);
+  await waitFor(
+    "return document.querySelector('[data-testid=project-total]')?.textContent.replace(/\\./g,'').includes('6482,84')",
+  );
+  await click("Guardar proyecto");
+  await waitFor(
+    "return document.body.textContent.includes('Proyecto guardado con las copias')",
+  );
+  await close();
+  await start();
+  await click("Proyectos");
+  await waitFor(
+    "return Array.from(document.querySelectorAll('button')).some(b=>b.textContent.trim()==='Abrir proyecto')",
+  );
+  await click("Abrir proyecto");
+  await waitFor(
+    "return document.querySelectorAll('[data-testid=project-resource]').length===2 && document.querySelector('[data-testid=project-total]')?.textContent.replace(/\\./g,'').includes('6482,84')",
+  );
+  await execute(`
+    window.__TAURI_INTERNALS__.invoke('list_projects').then(entries=>window.__TAURI_INTERNALS__.invoke('project_pdf',{data:entries[0]})).then(pdf=>{window.nativeProjectPdf=pdf;}).catch(e=>{window.nativeProjectPdfError=String(e);});
+  `);
+  await waitFor(
+    "return window.nativeProjectPdf?.bytes?.length>0 || !!window.nativeProjectPdfError",
+  );
+  const nativePdf = await execute("return window.nativeProjectPdf");
+  assert.ok(nativePdf, "PDF nativo ausente");
+  assert.equal(nativePdf.total, "6482.84");
+  assert.equal(nativePdf.monthly, "578.44");
+  assert.ok(nativePdf.pages >= 3);
+  assert.equal(Buffer.from(nativePdf.bytes).subarray(0, 5).toString(), "%PDF-");
+  writeFileSync("native-project.pdf", Buffer.from(nativePdf.bytes));
   const screenshot = await request(
     `/session/${session}/screenshot`,
     undefined,
@@ -175,7 +212,7 @@ try {
   );
   writeFileSync("native-smoke.png", Buffer.from(screenshot, "base64"));
   console.log(
-    "WebView + IPC + SQLite: importar, guardar, reiniciar y recuperar aprobados.",
+    "WebView + IPC + SQLite + PDF: presupuestos/proyectos recuperados y PDF generado en Rust.",
   );
 } catch (error) {
   if (session) {

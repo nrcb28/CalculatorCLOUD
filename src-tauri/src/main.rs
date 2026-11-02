@@ -107,15 +107,90 @@ fn save_budget(app: tauri::AppHandle, id: String, data: String) -> Result<(), St
 fn list_budgets(app: tauri::AppHandle) -> Result<Vec<String>, String> {
     storage::list_budgets(&database_path(&app)?)
 }
+#[tauri::command]
+fn save_project(app: tauri::AppHandle, data: String) -> Result<(), String> {
+    storage::save_project(&database_path(&app)?, &data)
+}
+#[tauri::command]
+fn list_projects(app: tauri::AppHandle) -> Result<Vec<String>, String> {
+    storage::list_projects(&database_path(&app)?)
+}
+#[tauri::command]
+async fn project_pdf(data: String) -> Result<cloudcost_core::report_pdf::ReportPdf, String> {
+    tokio::task::spawn_blocking(move || cloudcost_core::report_pdf::render(&data))
+        .await
+        .map_err(|_| "No se pudo generar el informe")?
+}
+#[derive(Serialize)]
+struct SavedPdf {
+    saved: bool,
+    pages: usize,
+    monthly: String,
+    total: String,
+}
+#[tauri::command]
+async fn save_project_pdf(
+    app: tauri::AppHandle,
+    data: String,
+    expected_monthly: String,
+    expected_total: String,
+) -> Result<SavedPdf, String> {
+    tokio::task::spawn_blocking(move || {
+        use std::io::Write;
+        use tauri_plugin_dialog::DialogExt;
+        let report = cloudcost_core::report_pdf::render(&data)?;
+        if report.monthly != expected_monthly || report.total != expected_total {
+            return Err(
+                "El cálculo PDF no coincide con el proyecto. No se guardó ningún archivo.".into(),
+            );
+        }
+        let chosen = app
+            .dialog()
+            .file()
+            .set_title("Guardar informe PDF del proyecto")
+            .add_filter("Documento PDF", &["pdf"])
+            .set_file_name("proyecto.pdf")
+            .blocking_save_file();
+        let saved = if let Some(file) = chosen {
+            let path = file.into_path().map_err(|_| "Ruta de PDF no disponible")?;
+            let parent = path.parent().ok_or("Carpeta no disponible")?;
+            let mut temp = tempfile::NamedTempFile::new_in(parent)
+                .map_err(|_| "No se pudo preparar el PDF en la carpeta elegida")?;
+            temp.write_all(&report.bytes)
+                .map_err(|_| "No se pudo escribir el PDF")?;
+            temp.as_file()
+                .sync_all()
+                .map_err(|_| "No se pudo completar el PDF")?;
+            temp.persist(path)
+                .map_err(|_| "No se pudo guardar el PDF en la ruta elegida")?;
+            true
+        } else {
+            false
+        };
+        Ok(SavedPdf {
+            saved,
+            pages: report.pages,
+            monthly: report.monthly,
+            total: report.total,
+        })
+    })
+    .await
+    .map_err(|_| "No se pudo exportar el informe")?
+}
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             azure_prices,
             azure_components,
             compute_quote,
             check_provider,
             save_budget,
-            list_budgets
+            list_budgets,
+            save_project,
+            list_projects,
+            project_pdf,
+            save_project_pdf
         ])
         .run(tauri::generate_context!())
         .expect("No se pudo iniciar CloudCost Compare");

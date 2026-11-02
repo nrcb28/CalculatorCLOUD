@@ -1,0 +1,448 @@
+{
+  "model": "resource-project-v1",
+  "id": "project-report-2026-11-02",
+  "name": "Simulación multirrecurso: Azure y AWS, precios conservados",
+  "created": "2026-11-02T16:26:27.693Z",
+  "resources": [
+    {
+      "id": "azure-api",
+      "name": "API Azure con disco y salida",
+      "provider": "Azure",
+      "snapshot": {
+        "comparisonQuotes": [
+          {
+            "model": "compute-retail-v1",
+            "provider": "AWS",
+            "instanceType": "m6i.xlarge",
+            "region": "eu-west-1",
+            "vcpu": 4,
+            "memoryGiB": 16,
+            "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+            "fetched": "2026-10-30T22:03:34.539764287+00:00",
+            "catalogVersion": "20261029175634",
+            "published": "2026-10-29T17:56:34Z",
+            "charges": [
+              {
+                "id": "AYYS5AHM8RP6N3F4.JRTCKXETXF.6YS6EN2CT7",
+                "description": "$0.214 per On Demand Linux m6i.xlarge Instance Hour",
+                "unit": "instance-hour",
+                "quantity": 1,
+                "unitPriceUSD": "0.2140000000",
+                "effective": "2026-10-01"
+              }
+            ]
+          }
+        ],
+        "usagePlan": {
+          "model": "monthly-usage-v1",
+          "months": [
+            {
+              "instances": 1,
+              "hours": 0
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            }
+          ]
+        },
+        "id": "usage-plan-2026-11-01",
+        "name": "Simulación: crecimiento en doce meses, precios conservados",
+        "created": "2026-11-01T23:08:59.549Z",
+        "fetched": "2026-10-29T16:39:14.263712014+00:00",
+        "components": {
+          "model": "premium-lrs-mgn-api-v1",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:31:59.924034209+00:00",
+          "region": "westeurope",
+          "disk": {
+            "meterId": "137d3f72-fe0e-4a78-b5d0-92d704aa3cac",
+            "meterName": "P10 LRS Disk",
+            "skuName": "P10 LRS",
+            "productName": "Premium SSD Managed Disks",
+            "armRegionName": "westeurope",
+            "unitOfMeasure": "1/Month",
+            "currencyCode": "USD",
+            "type": "Consumption",
+            "effectiveStartDate": "2018-05-01T00:00:00Z",
+            "retailPrice": 21.68,
+            "tierMinimumUnits": 0,
+            "isPrimaryMeterRegion": true
+          },
+          "network": [
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0,
+              "tierMinimumUnits": 0,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.087,
+              "tierMinimumUnits": 100,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.083,
+              "tierMinimumUnits": 10335,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.07,
+              "tierMinimumUnits": 51295,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.05,
+              "tierMinimumUnits": 153695,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.05,
+              "tierMinimumUnits": 512095,
+              "isPrimaryMeterRegion": false
+            }
+          ]
+        },
+        "config": {
+          "sku": "Standard_D4s_v5",
+          "region": "westeurope",
+          "instances": 1,
+          "hours": 730,
+          "storage": 100,
+          "egress": 1000,
+          "egressUsedGB": 0
+        },
+        "rates": [
+          {
+            "meterId": "1ab41620-5ffa-51b3-ac16-6416f9f747a9",
+            "meterName": "D4s v5",
+            "skuName": "Standard_D4s_v5",
+            "armSkuName": "Standard_D4s_v5",
+            "productName": "Virtual Machines Dsv5 Series",
+            "armRegionName": "westeurope",
+            "unitOfMeasure": "1 Hour",
+            "retailPrice": 0.23,
+            "currencyCode": "USD",
+            "effectiveStartDate": "2021-11-01T00:00:00Z",
+            "type": "Consumption",
+            "isPrimaryMeterRegion": true,
+            "tierMinimumUnits": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "aws-worker",
+      "name": "Procesamiento AWS, solo computación",
+      "provider": "AWS",
+      "snapshot": {
+        "comparisonQuotes": [
+          {
+            "model": "compute-retail-v1",
+            "provider": "AWS",
+            "instanceType": "m6i.xlarge",
+            "region": "eu-west-1",
+            "vcpu": 4,
+            "memoryGiB": 16,
+            "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+            "fetched": "2026-10-30T22:03:34.539764287+00:00",
+            "catalogVersion": "20261029175634",
+            "published": "2026-10-29T17:56:34Z",
+            "charges": [
+              {
+                "id": "AYYS5AHM8RP6N3F4.JRTCKXETXF.6YS6EN2CT7",
+                "description": "$0.214 per On Demand Linux m6i.xlarge Instance Hour",
+                "unit": "instance-hour",
+                "quantity": 1,
+                "unitPriceUSD": "0.2140000000",
+                "effective": "2026-10-01"
+              }
+            ]
+          }
+        ],
+        "usagePlan": {
+          "model": "monthly-usage-v1",
+          "months": [
+            {
+              "instances": 1,
+              "hours": 0
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 1,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            },
+            {
+              "instances": 2,
+              "hours": 730
+            }
+          ]
+        },
+        "id": "aws-worker-copy",
+        "name": "Simulación: crecimiento en doce meses, precios conservados",
+        "created": "2026-11-01T23:08:59.549Z",
+        "fetched": "2026-10-29T16:39:14.263712014+00:00",
+        "components": {
+          "model": "premium-lrs-mgn-api-v1",
+          "source": "https://prices.azure.com/api/retail/prices",
+          "fetched": "2026-10-29T16:31:59.924034209+00:00",
+          "region": "westeurope",
+          "disk": {
+            "meterId": "137d3f72-fe0e-4a78-b5d0-92d704aa3cac",
+            "meterName": "P10 LRS Disk",
+            "skuName": "P10 LRS",
+            "productName": "Premium SSD Managed Disks",
+            "armRegionName": "westeurope",
+            "unitOfMeasure": "1/Month",
+            "currencyCode": "USD",
+            "type": "Consumption",
+            "effectiveStartDate": "2018-05-01T00:00:00Z",
+            "retailPrice": 21.68,
+            "tierMinimumUnits": 0,
+            "isPrimaryMeterRegion": true
+          },
+          "network": [
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0,
+              "tierMinimumUnits": 0,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.087,
+              "tierMinimumUnits": 100,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.083,
+              "tierMinimumUnits": 10335,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.07,
+              "tierMinimumUnits": 51295,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.05,
+              "tierMinimumUnits": 153695,
+              "isPrimaryMeterRegion": false
+            },
+            {
+              "meterId": "9995d93a-7d35-4d3f-9c69-7a7fea447ef4",
+              "meterName": "Standard Data Transfer Out",
+              "skuName": "Standard",
+              "productName": "Rtn Preference: MGN",
+              "armRegionName": "westeurope",
+              "unitOfMeasure": "1 GB",
+              "currencyCode": "USD",
+              "type": "Consumption",
+              "effectiveStartDate": "2022-05-01T00:00:00Z",
+              "retailPrice": 0.05,
+              "tierMinimumUnits": 512095,
+              "isPrimaryMeterRegion": false
+            }
+          ]
+        },
+        "config": {
+          "sku": "Standard_D4s_v5",
+          "region": "westeurope",
+          "instances": 1,
+          "hours": 730,
+          "storage": 100,
+          "egress": 1000,
+          "egressUsedGB": 0
+        },
+        "rates": [
+          {
+            "meterId": "1ab41620-5ffa-51b3-ac16-6416f9f747a9",
+            "meterName": "D4s v5",
+            "skuName": "Standard_D4s_v5",
+            "armSkuName": "Standard_D4s_v5",
+            "productName": "Virtual Machines Dsv5 Series",
+            "armRegionName": "westeurope",
+            "unitOfMeasure": "1 Hour",
+            "retailPrice": 0.23,
+            "currencyCode": "USD",
+            "effectiveStartDate": "2021-11-01T00:00:00Z",
+            "type": "Consumption",
+            "isPrimaryMeterRegion": true,
+            "tierMinimumUnits": 0
+          }
+        ]
+      }
+    }
+  ]
+}

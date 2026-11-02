@@ -73,5 +73,6 @@ formato, compilación frontend y auditoría npm. El recorrido nativo Linux se
 amplía para recuperar el plan después de guardar y reiniciar la aplicación;
 su resultado e instaladores se comprueban en GitHub Actions.
 
-Quedan proyectos con recursos distintos, meses de calendario, variación de
-disco/red por periodo, descuentos, comparación entre planes y PDF nativo.
+La fase de [proyectos y PDF](PROJECTS-PDF.md) agrega recursos distintos y un
+informe nativo. Quedan meses de calendario, variación de disco/red por periodo,
+descuentos y comparación entre planes/proyectos.

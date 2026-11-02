@@ -360,3 +360,23 @@ fn monthly_plan_is_normalized_and_survives_reopening_without_losing_legacy_budge
     }
     assert_eq!(list_budgets(&disk.0).unwrap().len(), 2);
 }
+
+#[test]
+fn projects_survive_reopening_and_invalid_updates_preserve_saved_data() {
+    let disk = DiskDb::new();
+    let mut p: Value =
+        serde_json::from_str(include_str!("../../../tests/project-fixture.json")).unwrap();
+    save_budget(&disk.0, "legacy", &budget("legacy").to_string()).unwrap();
+    save_project(&disk.0, &p.to_string()).unwrap();
+    let saved = list_projects(&disk.0).unwrap();
+    assert_eq!(saved.len(), 1);
+    assert_eq!(list_budgets(&disk.0).unwrap().len(), 1);
+    p["resources"][1]["provider"] = json!("Azure");
+    assert!(save_project(&disk.0, &p.to_string()).is_err());
+    assert_eq!(list_projects(&disk.0).unwrap(), saved);
+    p["resources"][1]["provider"] = json!("AWS");
+    p["name"] = json!("Actualizado");
+    save_project(&disk.0, &p.to_string()).unwrap();
+    assert_eq!(list_projects(&disk.0).unwrap().len(), 1);
+    assert!(list_projects(&disk.0).unwrap()[0].contains("Actualizado"));
+}

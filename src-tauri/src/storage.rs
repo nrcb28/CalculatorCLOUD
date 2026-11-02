@@ -22,7 +22,7 @@ fn database(path: &Path) -> Result<Connection, String> {
     let db = Connection::open(path).map_err(|_| "No se pudo abrir SQLite")?;
     db.busy_timeout(Duration::from_secs(5))
         .map_err(|_| "SQLite no disponible")?;
-    db.execute_batch("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, data TEXT NOT NULL, fetched TEXT NOT NULL); CREATE TABLE IF NOT EXISTS budgets (id TEXT PRIMARY KEY, data TEXT NOT NULL);").map_err(|_| "No se pudo inicializar SQLite")?;
+    db.execute_batch("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, data TEXT NOT NULL, fetched TEXT NOT NULL); CREATE TABLE IF NOT EXISTS budgets (id TEXT PRIMARY KEY, data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, data TEXT NOT NULL);").map_err(|_| "No se pudo inicializar SQLite")?;
     Ok(db)
 }
 pub async fn azure_prices(
@@ -140,3 +140,20 @@ pub fn list_budgets(path: &Path) -> Result<Vec<String>, String> {
 
 #[cfg(test)]
 mod tests;
+
+pub fn save_project(path: &Path, data: &str) -> Result<(), String> {
+    let p = crate::project::normalize(data)?;
+    database(path)?.execute("INSERT INTO projects(id,data) VALUES(?1,?2) ON CONFLICT(id) DO UPDATE SET data=excluded.data",params![p["id"].as_str().ok_or("Falta ID")?,p.to_string()]).map_err(|_|"No se pudo guardar proyecto")?;
+    Ok(())
+}
+pub fn list_projects(path: &Path) -> Result<Vec<String>, String> {
+    let db = database(path)?;
+    let mut stmt = db
+        .prepare("SELECT data FROM projects ORDER BY rowid DESC LIMIT 1000")
+        .map_err(|_| "No se pudo leer proyectos")?;
+    let rows = stmt
+        .query_map([], |r| Ok(r.get::<_, String>(0).unwrap_or_default()))
+        .map_err(|_| "No se pudo leer proyectos")?;
+    rows.collect::<Result<Vec<String>, _>>()
+        .map_err(|_| "Proyectos no válidos".into())
+}

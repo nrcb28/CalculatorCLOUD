@@ -1,3 +1,5 @@
+import ProjectPanel, { newProject } from "./ProjectPanel";
+import { type Project } from "./project";
 import UsagePlanPanel from "./UsagePlanPanel";
 import { parseUsagePlan, type UsagePlan } from "./usage-plan";
 import HistoryPanel from "./HistoryPanel";
@@ -75,6 +77,7 @@ const pages = [
   { name: "Calculadora", icon: Calculator },
   { name: "Comparador", icon: ArrowLeftRight },
   { name: "Presupuestos", icon: FolderOpen },
+  { name: "Proyectos", icon: FolderOpen },
   { name: "Acceso a proveedores", icon: Plug },
   { name: "Preferencias", icon: Settings },
 ];
@@ -83,6 +86,7 @@ const descriptions: Record<string, string> = {
   Calculadora: "Construye tu escenario y consulta tarifas desde su fuente.",
   Comparador: "Compara con contexto. Decide con información completa.",
   Presupuestos: "Escenarios guardados, con sus precios y fechas originales.",
+  Proyectos: "Agrupa recursos, conserva sus tarifas y genera informes.",
   "Acceso a proveedores":
     "Comprueba el acceso a las fuentes oficiales de precios.",
   Preferencias: "Un espacio de trabajo a tu medida.",
@@ -116,6 +120,7 @@ function App() {
     [rates, setRates] = useState<Rate[]>([]),
     [fetched, setFetched] = useState(""),
     [selected, setSelected] = useState("");
+  const [project, setProject] = useState<Project>(newProject);
   const [usagePlan, setUsagePlan] = useState<UsagePlan>();
   const [comparisonQuotes, setComparisonQuotes] = useState<ComputeQuote[]>([]);
   const [components, setComponents] = useState<Components>();
@@ -1156,6 +1161,14 @@ function App() {
               </section>
               <HistoryPanel history={history} />
             </>
+          )}
+          {page === "Proyectos" && (
+            <ProjectPanel
+              project={project}
+              onChange={setProject}
+              getCurrent={snapshot}
+              onRestore={restore}
+            />
           )}
           {page === "Acceso a proveedores" && (
             <div className="provider-grid">

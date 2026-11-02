@@ -1345,3 +1345,37 @@ footer > span {
 .usage-plan tfoot td {
   font-weight: 600;
 }
+.project-panel p {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+.project-panel tbody td {
+  vertical-align: top;
+}
+.project-panel td button {
+  margin: 3px 0;
+}
+.project-panel caption {
+  text-align: left;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.project-panel td input,
+.project-panel td select {
+  min-width: 140px;
+}
+.project-panel summary {
+  cursor: pointer;
+}
+.project-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+}

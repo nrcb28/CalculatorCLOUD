@@ -25,7 +25,12 @@ Con tauri-driver 2.1.0, WebKitWebDriver, Xvfb y D-Bus, la prueba:
 
 No se reemplazan los comandos IPC. El directorio XDG temporal permanece entre
 las dos sesiones y se elimina al terminar; nunca se usa una base del usuario.
-La captura y el registro del controlador están en el artefacto
+El recorrido de proyectos añade después dos recursos, elige AWS para uno,
+guarda, reinicia una tercera sesión y recupera el proyecto. Genera el PDF
+mediante IPC Rust real, comprueba los totales y conserva `native-project.pdf`.
+No automatiza la selección de ruta en el diálogo del sistema.
+
+La captura, el PDF y el registro del controlador están en el artefacto
 `native-smoke-Linux` de Actions. El dato sintético no entra en producción.
 
 Para reproducir en Linux con las dependencias del workflow instaladas:

@@ -46,8 +46,8 @@ La validación de una importación no acredita su autenticidad contra el proveed
 
 Esta fase añade comparación histórica de dos presupuestos. La fase posterior
 incorpora [planes mensuales](USAGE-PLAN.md); las variaciones históricas siguen
-comparando el mes base, con aviso visible si hay planes. Proyectos con varios
-recursos, comparación entre planes y PDF nativo siguen pendientes.
+comparando el mes base, con aviso visible si hay planes. La fase de [proyectos y PDF](PROJECTS-PDF.md) añade recursos múltiples e informes;
+la comparación entre planes/proyectos sigue pendiente.
 
 ## Ejemplo reproducible y comprobaciones
 

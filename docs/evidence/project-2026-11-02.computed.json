@@ -1,0 +1,125 @@
+{
+  "resources": [
+    {
+      "id": "azure-api",
+      "name": "API Azure con disco y salida",
+      "provider": "Azure",
+      "instanceType": "Standard_D4s_v5",
+      "region": "westeurope",
+      "scope": "Computación + capacidad de discos + salida",
+      "monthly": "267.88",
+      "monthlyExact": "267.88",
+      "periodTotal": "4184.14",
+      "periodExact": "4184.14",
+      "months": [
+        "99.98",
+        "267.88",
+        "267.88",
+        "267.88",
+        "267.88",
+        "267.88",
+        "457.46",
+        "457.46",
+        "457.46",
+        "457.46",
+        "457.46",
+        "457.46"
+      ],
+      "source": "https://prices.azure.com/api/retail/prices",
+      "fetched": "2026-10-29T16:39:14.263712014+00:00"
+    },
+    {
+      "id": "aws-worker",
+      "name": "Procesamiento AWS, solo computación",
+      "provider": "AWS",
+      "instanceType": "m6i.xlarge",
+      "region": "eu-west-1",
+      "scope": "Solo computación",
+      "monthly": "156.22",
+      "monthlyExact": "156.22",
+      "periodTotal": "2655.74",
+      "periodExact": "2655.74",
+      "months": [
+        "0",
+        "156.22",
+        "156.22",
+        "156.22",
+        "156.22",
+        "156.22",
+        "312.44",
+        "312.44",
+        "312.44",
+        "312.44",
+        "312.44",
+        "312.44"
+      ],
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/eu-west-1/index.csv",
+      "fetched": "2026-10-30T22:03:34.539764287+00:00"
+    }
+  ],
+  "monthly": "424.10",
+  "monthlyExact": "424.1",
+  "periodTotal": "6839.88",
+  "months": [
+    {
+      "month": 1,
+      "amount": "99.98",
+      "exact": "99.98"
+    },
+    {
+      "month": 2,
+      "amount": "424.10",
+      "exact": "424.1"
+    },
+    {
+      "month": 3,
+      "amount": "424.10",
+      "exact": "424.1"
+    },
+    {
+      "month": 4,
+      "amount": "424.10",
+      "exact": "424.1"
+    },
+    {
+      "month": 5,
+      "amount": "424.10",
+      "exact": "424.1"
+    },
+    {
+      "month": 6,
+      "amount": "424.10",
+      "exact": "424.1"
+    },
+    {
+      "month": 7,
+      "amount": "769.90",
+      "exact": "769.9"
+    },
+    {
+      "month": 8,
+      "amount": "769.90",
+      "exact": "769.9"
+    },
+    {
+      "month": 9,
+      "amount": "769.90",
+      "exact": "769.9"
+    },
+    {
+      "month": 10,
+      "amount": "769.90",
+      "exact": "769.9"
+    },
+    {
+      "month": 11,
+      "amount": "769.90",
+      "exact": "769.9"
+    },
+    {
+      "month": 12,
+      "amount": "769.90",
+      "exact": "769.9"
+    }
+  ]
+}
